@@ -1,31 +1,17 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { ShieldCheck } from 'lucide-react'
-
-function Home() {
-  return (
-    <main
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 12,
-        minHeight: '100svh',
-      }}
-    >
-      <ShieldCheck size={32} aria-hidden="true" />
-      <h1 style={{ fontSize: 24, fontWeight: 600, margin: 0 }}>CheckMate</h1>
-      <p style={{ margin: 0, color: '#6b6375' }}>App Skeleton 已就緒</p>
-    </main>
-  )
-}
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { CaseDetailPage } from './features/case-review/CaseDetailPage'
+import { CaseListPage } from './features/case-review/CaseListPage'
+import { CaseReviewProvider } from './features/case-review/CaseReviewContext'
 
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-      </Routes>
+      <CaseReviewProvider>
+        <Routes>
+          <Route path="/" element={<CaseListPage />} />
+          <Route path="/cases/:caseId" element={<CaseDetailPage />} />
+        </Routes>
+      </CaseReviewProvider>
     </BrowserRouter>
   )
 }

@@ -70,7 +70,7 @@ CheckMate 更值得驗證的能力包括：
 
 ### 3. 決策資料本身可能成為長期資產
 
-Case → Agent Finding → Human Decision → Override → Final Outcome
+案件 → Agent 發現項目（Finding）→ 人工決策（Human Decision）→ 覆寫（Override）→ 最終結果（Final Outcome）
 
 若能持續累積上述資料，企業可進一步看見：
 
@@ -83,17 +83,17 @@ Case → Agent Finding → Human Decision → Override → Final Outcome
 
 若要求企業先替換 ERP、BPM 或費用管理系統，導入成本與阻力會增加。
 
-因此目前方向是把 CheckMate 定位為既有系統之上的 **Review & Control Layer**，可從檔案上傳、批次審查開始，再逐步串接 API 或嵌入現有 Workflow。
+因此目前方向是把 CheckMate 定位為既有系統之上的**審查與控制層（Review & Control Layer）**，可從檔案上傳、批次審查開始，再逐步串接 API 或嵌入既有流程（Workflow）。
 
 ## 肆、待驗證假設
 
 | 假設 | 為什麼重要 | 驗證方式 |
 |---|---|---|
-| 財務團隊願意讓 Agent 執行部分後續處置 | 決定 Agentic Value 是否成立 | 訪談、Prototype 測試 |
-| Evidence Chain 足以建立操作信任 | 決定使用者是否敢依結果行動 | Usability Test |
-| 合理性與歷史風險比單純規則檢查更具差異化 | 決定產品 Positioning | 客訪、競品比較 |
-| 低門檻疊加既有系統是重要採購因素 | 決定 GTM 與 Integration Strategy | CFO／IT 訪談 |
-| Human Override 與結果資料能反饋制度改善 | 決定長期 Data Flywheel 是否成立 | 實際案件資料驗證 |
+| 財務團隊願意讓 Agent 執行部分後續處置 | 決定代理式價值（Agentic Value）是否成立 | 訪談、原型（Prototype）測試 |
+| 佐證鏈（Evidence Chain）足以建立操作信任 | 決定使用者是否敢依結果行動 | 可用性測試（Usability Test） |
+| 合理性與歷史風險比單純規則檢查更具差異化 | 決定產品定位（Positioning） | 客訪、競品比較 |
+| 低門檻疊加既有系統是重要採購因素 | 決定市場推廣（GTM）與整合策略（Integration Strategy） | CFO／IT 訪談 |
+| 人工覆寫（Override）與結果資料能反饋制度改善 | 決定長期資料飛輪（Data Flywheel）是否成立 | 實際案件資料驗證 |
 
 ## 伍、目前待確認資訊
 

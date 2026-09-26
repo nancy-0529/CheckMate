@@ -41,6 +41,12 @@
 
 ## 4. 開發方式
 
+### Skill Discipline
+
+開始任何新產品行為（新 User Story／Product Slice）或除錯任務前，
+先確認 Superpowers 流程 skill（如 brainstorming、systematic-debugging）是否適用，
+不得因為需求或問題描述已經很清楚而跳過檢查。
+
 產品功能以可獨立驗收的 **User Story / Product Slice** 作為主要開發單位。
 
 已收斂的非瑣碎產品行為，依以下流程進行：
@@ -110,3 +116,12 @@ Bug Fix、Refactor、Chore、Spike 等非產品功能變更可以獨立處理，
 - 不為了配合既有 Code 而改寫已定案的產品規則。
 - 不把 Mock Data 或 Demo 邏輯包裝成已完成的 Production 能力。
 - 發現需求超出 Product Scope、需要新增產品流程或自動化權限時，先提出再實作。
+
+## 8. PRD Review Criteria
+
+撰寫或修改 User Story、User Flow、Edge Case、PRD、Feature Spec、Acceptance Criteria 時，須依 `docs/product/prd-review-criteria.md` 檢查，依文件所處階段套用不同嚴謹度：
+
+- **探索／全局骨架階段**（例如 User Flow、Edge Case Map 等尚未收斂的文件）：Criteria 用來幫助思考與避免遺漏，不要求每個不適用項目都形式化標示 N/A。若某項明顯不屬於當前文件層級，可不展開，但不能因此掩蓋真正未決的產品問題。
+- **Feature Spec／Acceptance Criteria 階段**：需逐項套用 Criteria；不適用項目應標示 N/A 並簡要說明原因，不可直接忽略。
+- 檢查須在撰寫階段主動進行，不是只在文件完成後才回頭 Review。
+- Criteria 是品質檢查標準，不代表每份文件都要承載所有細節；內容應放在正確的文件層級（例如 User Flow 不需要涵蓋效能門檻，那屬於 Feature Spec／Acceptance Criteria 層級）。
