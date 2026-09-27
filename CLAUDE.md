@@ -125,3 +125,4 @@ Bug Fix、Refactor、Chore、Spike 等非產品功能變更可以獨立處理，
 - **Feature Spec／Acceptance Criteria 階段**：需逐項套用 Criteria；不適用項目應標示 N/A 並簡要說明原因，不可直接忽略。
 - 檢查須在撰寫階段主動進行，不是只在文件完成後才回頭 Review。
 - Criteria 是品質檢查標準，不代表每份文件都要承載所有細節；內容應放在正確的文件層級（例如 User Flow 不需要涵蓋效能門檻，那屬於 Feature Spec／Acceptance Criteria 層級）。
+- 這是撰寫過程的內部檢查依據，不是交付內容。發現的缺漏要直接修進文件對應段落；不要把檢查清單、逐項 N/A 說明等過程紀錄留在交付給團隊的文件裡。
