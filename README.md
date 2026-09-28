@@ -6,17 +6,11 @@ CheckMate 是企業費用審查中的代理式（Agentic）服務，協助完成
 
 ---
 
-## 目前可操作版本
+## 現況
 
-Expense Case Review Prototype：深海軍藍工作台，案件列表與詳情並排，開啟案件時導覽自動收合。八筆模擬案件提供三種初審建議、分欄搜尋、複選篩選、按需展開的依據與歷史快照。預設依處理進度分流，退回及完成案件移至對應檢視。申報項目獨立成欄；三類案件皆有明細與模擬憑證預覽，建議通過支援勾選批次完成。
+目前是 Expense Case Review Prototype：純前端、8 筆模擬案件的案件初審工作台，展示審查建議、依據、人工處理與歷史紀錄的核心體驗。使用預置分析結果，尚未串接 OCR、AI 分析引擎或後端；所有操作僅存在瀏覽器記憶體中，重新整理即重設。
 
-建議依序操作：`EXP-2026-001` 完成初審、`EXP-2026-002` 要求補件、`EXP-2026-003` 確認金額差異並留下人工審核說明。`EXP-2026-005` 可查看疑似重複案件對照，`EXP-2026-001` 可切換歷史紀錄。
-
-此版本使用預置分析結果；處理操作只改變目前頁面的記憶體狀態，重新整理會重設。不發送通知、不推進外部流程，尚未實作 OCR 或 AI 分析引擎。探索中的操作細節仍待 review，不視為正式工作流程定案。
-
-E-01 v1 金額比對（見 [金額比對規格](specs/amount-check.md)）已實作為純函式並有單元測試，目前無使用者可見入口。
-
-驗證指令：`npm test`、`npm run build`、`npm run lint`。自動測試涵蓋搜尋／篩選、人工處理原因、歷史紀錄與重複處理防護，不代表分析引擎已通過驗收。各階段範圍見 [Product Scope](docs/product/product-scope.md)。
+版本範圍與下一步見 [Product Scope](docs/product/product-scope.md)；目前實作細節與已知取捨見 [開發交接](docs/development/handoff.md)。
 
 ---
 
@@ -146,17 +140,11 @@ CheckMate 聚焦於**費用初審、風險辨識與受控處置**，不是完整
 
 ```bash
 npm install
-npm run dev
+npm run dev      # 本機開發，依終端機顯示的網址開啟瀏覽器
+npm test         # 單元測試
+npm run build    # production build
+npm run lint     # 程式碼風格檢查
 ```
-
-或：
-
-```bash
-pnpm install
-pnpm dev
-```
-
-啟動成功後，依終端機顯示的本機網址開啟瀏覽器。
 
 ---
 
@@ -172,22 +160,26 @@ pnpm dev
 │   │   ├── original-challenge.md
 │   │   ├── product-discovery.md
 │   │   ├── product-brief.md
-│   │   └── product-scope.md
-│   │
-│   └── design/
-│       ├── design-system.md
-│       └── interaction-patterns.md
+│   │   ├── product-scope.md
+│   │   └── prd-review-criteria.md
+│   ├── design/
+│   │   ├── design-system.md
+│   │   └── interaction-patterns.md
+│   └── development/
+│       └── handoff.md
 │
 ├── specs/
-│   └── <定案後的 user story>.md
+│   ├── review-case.md
+│   └── amount-check.md
+│
+├── public/fixtures/        # 模擬憑證 SVG
 │
 ├── src/
-│   ├── components/
-│   ├── features/
-│   ├── data/
-│   ├── types/
+│   ├── data/cases.ts       # 模擬案件資料
+│   ├── features/review/    # 審查邏輯（搜尋、處理進度、金額比對）
 │   ├── App.tsx
-│   └── main.tsx
+│   ├── main.tsx
+│   └── index.css
 │
 ├── package.json
 └── vite.config.ts
@@ -205,6 +197,7 @@ pnpm dev
 | `docs/product/product-scope.md` | 本次版本的範圍、優先級與邊界 |
 | `docs/design/design-system.md` | 視覺、元件與 UX Writing 原則 |
 | `docs/design/interaction-patterns.md` | 共用操作流程與互動規則 |
+| `docs/development/handoff.md` | 目前實作狀態、已知取捨與開發交接紀錄 |
 | `specs/` | 已收斂 User Story / Feature 的行為規格與驗收條件 |
 | `CLAUDE.md` | AI 協作時的核心規則 |
 
