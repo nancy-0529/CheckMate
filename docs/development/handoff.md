@@ -7,7 +7,7 @@ React 19 + TypeScript + Vite，純前端，8 筆完整預置案例。開發前�
 - 依待處理／待補件／已完成初審／全部分流；初審建議是獨立篩選。
 - 支援單筆模擬處理、建議通過的批次完成，以及人工確認原因與歷史檢視。
 - 工作台的完整初審結果皆為預置資料，SVG 憑證全是模擬素材。
-- E-01 v1 金額比對（`src/features/review/amount-check.ts`）已實作為純函式並有單元測試，目前無使用者可見入口（見下方「已嘗試並回退」）。
+- E-01 v1 金額比對（`app/src/features/review/amount-check.ts`）已實作為純函式並有單元測試，目前無使用者可見入口（見下方「已嘗試並回退」）。
 - 所有操作只在記憶體內；刷新清除。沒有後端、登入權限、LLM、OCR、寄信、ERP 或付款串接。
 
 ## 已嘗試並回退：單一案件的即時初審流程
@@ -31,20 +31,24 @@ React 19 + TypeScript + Vite，純前端，8 筆完整預置案例。開發前�
 - 不使用真實個資或公司財務資料。
 
 ## 主要入口
-- src/App.tsx：工作台、詳情與處理對話框。
-- src/data/cases.ts：模擬案件、費用明細及憑證關係。
-- src/features/review/workbench.ts：搜尋、處理進度、批次操作。
-- src/features/review/amount-check.ts：精確金額比較（E-01 v1 純函式），目前無使用者可見入口。
+- app/src/App.tsx：工作台、詳情與處理對話框。
+- app/src/data/cases.ts：模擬案件、費用明細及憑證關係。
+- app/src/features/review/workbench.ts：搜尋、處理進度、批次操作。
+- app/src/features/review/amount-check.ts：精確金額比較（E-01 v1 純函式），目前無使用者可見入口。
 - specs/amount-check.md：目前單項檢查的範圍與限制。
 
 ## 驗證與部署
+（以下指令在 `app/` 資料夾內執行；repo 結構見根目錄 README。）
+
+```bash
 npm install
 npm test
 npm run build
 npm run lint
 npm run dev
+```
 
-部署目標 Vercel，SPA 路由透過 vercel.json 回到 index.html。Vercel CLI 可部署目前工作目錄，不必先 commit／push。部署網址供操作及 review，不提供開發原始碼；Claude 接手需要本機工作目錄或另行授權的原始碼交付。
+部署目標 Vercel，SPA 路由透過 app/vercel.json 回到 index.html。Vercel CLI 可部署目前工作目錄，不必先 commit／push。部署網址供操作及 review，不提供開發原始碼；Claude 接手需要本機工作目錄或另行授權的原始碼交付。
 
 ## 本次部署
 

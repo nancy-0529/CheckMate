@@ -6,6 +6,23 @@ CheckMate 是企業費用審查中的代理式（Agentic）服務，協助完成
 
 ---
 
+## 專案總覽
+
+這個 repo 收齊 CheckMate 專題的全部成果：產品文件、可操作的原型、展場互動版、簡報、發布影片與立牌印刷檔。
+
+| 資料夾 | 內容 | 線上版本 |
+|---|---|---|
+| [`docs/`](docs/) + [`specs/`](specs/) | 原始命題、產品探索、Product Brief、範圍、設計規範、行為規格 | — |
+| [`app/`](app/) | **主原型**：案件初審工作台（React + Vite，8 筆模擬案件） | [checkmate-demo-mauve.vercel.app](https://checkmate-demo-mauve.vercel.app) |
+| [`booth/`](booth/) | **展場互動版**：現場送件、調整企業規範、查看稽核紀錄 | [checkmate-booth.vercel.app](https://checkmate-booth.vercel.app) |
+| [`pitch/`](pitch/) | **Pitch 簡報**（18 頁，含發布影片） | [checkmate-pitch-mu.vercel.app](https://checkmate-pitch-mu.vercel.app/s/checkmate-pitch) |
+| [`video/`](video/) | **發布影片**（88.5 秒）的原始檔與渲染工具 | 見簡報第 5 頁 |
+| [`print/`](print/) | 展場立牌（90×180 cm）向量印刷檔 | — |
+
+想快速理解專題，建議的閱讀順序：[專案脈絡](docs/PROJECT.md) → 本頁下方的產品說明 → 線上原型與簡報。
+
+---
+
 ## 現況
 
 目前是 Expense Case Review Prototype：純前端、8 筆模擬案件的案件初審工作台，展示審查建議、依據、人工處理與歷史紀錄的核心體驗。使用預置分析結果，尚未串接 OCR、AI 分析引擎或後端；所有操作僅存在瀏覽器記憶體中，重新整理即重設。
@@ -138,7 +155,10 @@ CheckMate 聚焦於**費用初審、風險辨識與受控處置**，不是完整
 
 ### 安裝與啟動
 
+原型在 `app/` 底下（展場版在 `booth/`，指令相同）：
+
 ```bash
+cd app
 npm install
 npm run dev      # 本機開發，依終端機顯示的網址開啟瀏覽器
 npm test         # 單元測試
@@ -153,36 +173,21 @@ npm run lint     # 程式碼風格檢查
 ```text
 /
 ├── README.md
-├── CLAUDE.md
+├── CLAUDE.md               # AI 協作規則
+├── docs/                   # 產品、設計、開發文件（含 PROJECT.md 專案脈絡）
+├── specs/                  # 已收斂功能的行為規格
 │
-├── docs/
-│   ├── product/
-│   │   ├── original-challenge.md
-│   │   ├── product-discovery.md
-│   │   ├── product-brief.md
-│   │   ├── product-scope.md
-│   │   └── prd-review-criteria.md
-│   ├── design/
-│   │   ├── design-system.md
-│   │   └── interaction-patterns.md
-│   └── development/
-│       └── handoff.md
-│
-├── specs/
-│   ├── review-case.md
-│   └── amount-check.md
-│
-├── public/fixtures/        # 模擬憑證 SVG
-│
-├── src/
-│   ├── data/cases.ts       # 模擬案件資料
-│   ├── features/review/    # 審查邏輯（搜尋、處理進度、金額比對）
-│   ├── App.tsx
-│   ├── main.tsx
-│   └── index.css
-│
-├── package.json
-└── vite.config.ts
+├── app/                    # 主原型（React + Vite）
+│   ├── public/fixtures/    # 模擬憑證 SVG
+│   └── src/
+│       ├── data/cases.ts       # 模擬案件資料
+│       ├── features/review/    # 審查邏輯（搜尋、處理進度、金額比對）
+│       ├── App.tsx
+│       └── index.css
+├── booth/                  # 展場互動版（React + Vite）
+├── pitch/                  # 簡報（open-slide）
+├── video/                  # 發布影片原始檔與渲染工具
+└── print/                  # 立牌印刷檔
 ```
 
 ---

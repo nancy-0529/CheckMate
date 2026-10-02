@@ -146,3 +146,19 @@ vite.config.ts.timestamp-*
 .vercel/
 .DS_Store
 .vercel
+
+# macOS
+.DS_Store
+
+# 影片渲染中間檔（video/）
+video/**/frames/
+video/**/mix.wav
+video/**/shot-*.png
+video/**/video.mp4
+video/tools/encode
+video/tools/mux
+
+# 部署與本機設定
+.deploy/
+.env.local
+*.tsbuildinfo
