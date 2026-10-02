@@ -1,0 +1,741 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CheckMate Launch Film</title>
+<style>
+:root{
+  --bg:#070F1A; --primary:#1849A9; --primary-soft:#E8EFFB;
+  --text:#142B45; --muted:#5E6E80; --line:#D6DEE9;
+  --ok:#1F7A4D; --ok-bg:#E4F3EA; --warn:#A35A06; --warn-bg:#FDF1DE;
+  --bad:#B42318; --bad-bg:#FCE9E7; --ink2:#8FA3BA; --kick:#6F93C9;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#000;overflow:hidden}
+#stage{width:1920px;height:1080px;position:absolute;left:0;top:0;transform-origin:0 0;overflow:hidden;
+  background:radial-gradient(ellipse 80% 70% at 50% 45%,#0C1B2C 0%,var(--bg) 70%);
+  font-family:"PingFang TC","Noto Sans TC","Heiti TC",sans-serif;color:#fff;-webkit-font-smoothing:antialiased}
+.abs{position:absolute}
+.scene{position:absolute;inset:0;opacity:0}
+.cam{position:absolute;inset:0;transform-origin:960px 540px}
+svg.i{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;display:block}
+.tx{position:absolute;left:0;right:0;text-align:center;font-weight:600}
+.xl{font-size:92px;line-height:1.2}
+.lg{font-size:72px;line-height:1.25}
+.cap{font-size:44px;line-height:1.3}
+.kick{font-size:19px;letter-spacing:.34em;color:var(--kick);font-weight:600}
+.src{position:absolute;right:80px;bottom:60px;font-size:17px;color:#5F7591}
+.t-ok{background:var(--ok-bg);color:var(--ok)} .t-bad{background:var(--bad-bg);color:var(--bad)}
+.t-warn{background:var(--warn-bg);color:var(--warn)} .t-info{background:var(--primary-soft);color:var(--primary)}
+.badge{display:inline-flex;align-items:center;gap:8px;font-size:18px;font-weight:600;padding:5px 12px;border-radius:999px;white-space:nowrap}
+.badge::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.badge.o{background:transparent;border:2px solid currentColor}
+
+/* flicker + stat + wall */
+.fl{position:absolute;width:220px;height:130px;border-radius:10px;background:#F6F3EA;color:#293241;padding:16px 18px;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.fl small{display:block;font-size:13px;color:#8A96A6} .fl b{display:block;font-size:20px;margin-top:10px} .fl span{display:block;font-size:26px;font-weight:700;margin-top:6px}
+.sc{position:absolute;top:470px;width:150px;height:190px;border-radius:12px;background:#13243A;border:2px solid #24466A;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:#8FA3BA;font-size:48px}
+.sc .ln{width:80px;height:6px;border-radius:3px;background:#2A4566}
+.sc.red{position:absolute;inset:-2px;background:#3A1512;border-color:#E0554A;color:#FF8A7E}
+.wc{position:absolute;width:200px;height:110px;border-radius:10px;background:#13243A;border:1px solid #20395A;padding:14px 16px}
+.wc small{display:block;font-size:14px;color:#6F86A3} .wc b{display:block;font-size:19px;font-weight:600;color:#C9D6E6;margin-top:6px}
+.wc span{display:block;font-size:15px;color:#8FA3BA;margin-top:4px}
+.wk{position:absolute;right:10px;top:10px;width:30px;height:30px;border-radius:50%;background:#1F7A4D;color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px}
+.logo{position:absolute;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:30px}
+.mark{width:124px;height:124px;border-radius:28px;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:76px;color:#fff}
+.word{font-size:118px;font-weight:700;letter-spacing:-.015em}
+
+/* rail */
+.rl{position:absolute;height:3px;border-radius:2px;background:#2A4566;transform-origin:0 50%}
+.st{position:absolute;width:72px;height:72px}
+.node{position:absolute;inset:0;border-radius:50%;background:#0F2033;border:2px solid #2F4D71;color:#8FA3BA;display:flex;align-items:center;justify-content:center;font-size:30px}
+.node.on{background:var(--primary);border-color:#4B7BDA;color:#fff;opacity:0}
+.node.no{background:var(--bad);border-color:#E0554A;color:#fff;opacity:0}
+.stl{position:absolute;width:240px;text-align:center}
+.stl b{display:flex;align-items:center;justify-content:center;gap:10px;font-size:27px;font-weight:600}
+.stl small{display:block;font-size:17px;color:var(--ink2);margin-top:6px}
+.tg{font-style:normal;font-size:15px;font-weight:600;padding:2px 9px;border-radius:6px;letter-spacing:.04em}
+.tg.o{border:1.5px solid #8DB0E6;color:#8DB0E6} .tg.s{background:#8DB0E6;color:#0B1726}
+.case{position:absolute;width:300px;height:96px;background:#fff;color:var(--text);border-radius:14px;box-shadow:0 24px 60px rgba(0,0,0,.5);padding:16px 20px;z-index:4}
+.case small{display:block;font-size:16px;color:var(--muted)} .case b{display:block;font-size:22px;font-weight:600;margin-top:4px;white-space:nowrap}
+.case .badge{position:absolute;right:14px;top:12px;font-size:15px;padding:3px 9px}
+.mc{position:absolute;width:220px;height:72px;background:#fff;color:var(--text);border-radius:12px;box-shadow:0 18px 40px rgba(0,0,0,.45);padding:11px 16px;z-index:4}
+.mc small{display:block;font-size:14px;color:var(--muted)} .mc b{display:block;font-size:18px;font-weight:600;margin-top:2px;white-space:nowrap}
+.mc .badge{position:absolute;right:10px;top:9px;font-size:12px;padding:2px 7px;gap:5px}
+.mc .badge::before{width:6px;height:6px}
+.toast{position:absolute;display:flex;align-items:center;gap:10px;font-size:20px;font-weight:600;padding:10px 16px;border-radius:10px;white-space:nowrap;box-shadow:0 14px 34px rgba(0,0,0,.35)}
+.toast svg{font-size:20px}
+.pop{position:absolute;width:440px;background:#fff;color:var(--text);border-radius:14px;box-shadow:0 30px 70px rgba(0,0,0,.5);padding:14px 22px}
+.pr{height:44px;display:flex;align-items:center;gap:14px;font-size:20px;font-weight:600;border-bottom:1px solid #EDF1F5}
+.pr:last-child{border-bottom:0}
+.pr .ic{width:28px;height:28px;border-radius:50%;background:var(--ok-bg);color:var(--ok);display:flex;align-items:center;justify-content:center;font-size:16px}
+.pr em{margin-left:auto;font-style:normal;font-size:16px;color:var(--muted);font-weight:500}
+.bar-gate{position:absolute;width:12px;height:190px;border-radius:6px;background:var(--bad);box-shadow:0 0 0 6px rgba(180,35,24,.18);z-index:5}
+.why{position:absolute;font-size:21px;font-weight:600;color:#FF9C90;white-space:nowrap}
+.log{position:absolute;left:160px;font-size:18px;color:#8FA3BA;font-family:"SF Mono",Menlo,monospace}
+.log b{color:#DCE6F2;font-weight:500}
+
+/* evidence → finding */
+.paper{position:absolute;left:700px;top:170px;width:520px;height:700px;background:#FFFDF7;color:#293241;border-radius:8px;box-shadow:0 40px 90px rgba(0,0,0,.5);padding:44px 44px}
+.paper .tag{font-size:15px;color:#8A96A6;text-align:center;border-bottom:1px solid #D9DEE5;padding-bottom:14px}
+.paper .v{font-size:32px;text-align:center;margin-top:24px;font-weight:600} .paper .s{font-size:20px;text-align:center;color:#6B7684;margin-top:6px}
+.paper .ln{display:flex;justify-content:space-between;font-size:20px;margin-top:22px}
+.pamt{position:absolute;left:0;right:0;top:446px;text-align:center;font-size:48px;font-weight:700}
+.pamt small{display:block;font-size:18px;color:#6B7684;font-weight:500;margin-bottom:4px}
+.panel{position:absolute;background:#fff;color:var(--text);border-radius:18px;box-shadow:0 50px 120px rgba(0,0,0,.55)}
+.ph{position:absolute;left:0;right:0;top:0;height:120px;border-bottom:1px solid var(--line);padding:24px 40px}
+.ph .cid{font-size:19px;color:var(--muted)} .ph .ttl{font-size:30px;font-weight:600;margin-top:6px}
+.bartrack{position:absolute;left:40px;top:200px;width:1020px;height:44px;border-radius:8px;background:#EEF1F5}
+.bar{position:absolute;left:0;top:0;bottom:0;width:612px;border-radius:8px 0 0 8px;background:#8FA3BA;transform-origin:0 50%}
+.over{position:absolute;left:612px;top:0;bottom:0;width:245px;border-radius:0 8px 8px 0;background:var(--bad);transform-origin:0 50%}
+.limit{position:absolute;left:611px;top:-30px;bottom:-14px;width:3px;background:var(--text)}
+.limlbl{position:absolute;font-size:19px;font-weight:600;white-space:nowrap}
+.amt{position:absolute;left:0;top:0;width:0;height:0;z-index:6}
+.amt span{position:absolute;left:0;top:0;transform:translate(-50%,-50%);font-size:48px;font-weight:700;white-space:nowrap}
+.frow{position:absolute;left:40px;right:40px;top:290px;height:92px;border-top:1px solid #E7ECF3;border-bottom:1px solid #E7ECF3;display:flex;align-items:center;gap:22px}
+.frow .ic{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:23px}
+.frow b{display:block;font-size:25px} .frow span{display:block;font-size:20px;color:var(--muted);margin-top:4px}
+.frow .res{margin-left:auto;font-size:20px;font-weight:600;padding:6px 14px;border-radius:6px}
+.chip{display:inline-flex;align-items:center;gap:8px;font-size:19px;font-weight:600;padding:8px 14px;border-radius:8px;border:1.5px solid #C7D3E3;color:var(--text);background:#F7F9FC}
+.chip b{color:var(--primary)}
+
+/* duplicate */
+.dc{position:absolute;top:330px;width:460px;height:340px;background:#fff;color:var(--text);border-radius:16px;box-shadow:0 40px 90px rgba(0,0,0,.5);padding:24px 26px}
+.dc .cid{font-size:17px;color:var(--muted)} .dc .ttl{font-size:25px;font-weight:600;margin-top:4px}
+.df{position:absolute;left:18px;right:18px;height:50px;border-radius:8px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;font-size:19px}
+.df small{font-size:17px;color:var(--muted)} .df b{font-size:21px;position:relative}
+.df .hl{position:absolute;inset:0;border-radius:8px;background:#FDF1DE;border:2px solid #E7B566;opacity:0}
+.df > *:not(.hl){position:relative}
+.link{position:absolute;height:3px;background:#E7B566;transform-origin:0 50%}
+.pill{position:absolute;display:flex;align-items:center;gap:12px;font-size:30px;font-weight:600;padding:14px 30px;border-radius:999px;white-space:nowrap}
+.pill::before{content:"";width:12px;height:12px;border-radius:50%;background:currentColor}
+
+/* basis */
+.bc{position:absolute;top:420px;width:440px;height:230px;background:#fff;color:var(--text);border-radius:16px;box-shadow:0 40px 90px rgba(0,0,0,.5);padding:28px 30px}
+.bc .h{display:flex;align-items:center;gap:14px;font-size:25px;font-weight:600}
+.bc .h i{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px}
+.bc .d{font-size:18px;color:var(--muted);margin-top:10px}
+.bchip{position:absolute;left:30px;bottom:26px;display:flex;align-items:center;gap:8px;font-size:18px;font-weight:600;padding:9px 14px;border-radius:8px;border:1.5px solid #C7D3E3;color:var(--muted);background:#F7F9FC}
+.bchip.on{inset:auto auto 26px 30px;border-color:var(--primary);background:var(--primary-soft);color:var(--primary);opacity:0}
+.checks4{position:absolute;left:0;right:0;top:500px;display:flex;justify-content:center;gap:64px}
+.checks4 span{display:flex;align-items:center;gap:14px;font-size:44px;font-weight:600;color:#DCE6F2}
+.checks4 svg{font-size:40px;color:#5CC08A}
+.loc{position:absolute;top:330px;width:560px;height:290px;border-radius:18px;background:#fff;color:var(--text);box-shadow:0 40px 90px rgba(0,0,0,.5);padding:34px 40px}
+.loc .k{font-size:21px;color:var(--muted);font-weight:600;display:flex;align-items:center;gap:10px}
+.loc .city{font-size:88px;font-weight:700;margin-top:14px;display:flex;align-items:center;gap:18px}
+.loc .city svg{font-size:62px}
+.loc .d{font-size:22px;color:var(--muted);margin-top:8px}
+.dash{position:absolute;top:474px;height:0;border-top:4px dashed #FF8A7E}
+.dashlbl{position:absolute;top:410px;font-size:21px;font-weight:600;color:#FF9C90;text-align:center}
+
+/* product UI */
+.win{position:absolute;background:#F1F4F8;border-radius:14px;overflow:hidden;box-shadow:0 50px 120px rgba(0,0,0,.55);color:var(--text)}
+.side{position:absolute;left:0;top:0;bottom:0;width:72px;background:#102A43;display:flex;flex-direction:column;align-items:center;padding-top:14px;gap:22px}
+.side .bm{width:42px;height:42px;border-radius:10px;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px}
+.side .ni{width:44px;height:44px;border-radius:10px;background:rgba(255,255,255,.12);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px}
+.topb{position:absolute;left:72px;right:0;top:0;height:56px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 24px;font-size:17px;color:var(--muted);gap:10px}
+.topb .av{margin-left:auto;width:32px;height:32px;border-radius:50%;background:#E8EFFB;color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700}
+.lst{position:absolute;left:72px;right:0;top:56px;bottom:0;padding:22px 28px}
+.lst h2{font-size:26px;font-weight:600} .lst h2 small{font-size:16px;color:var(--muted);font-weight:500;margin-left:10px}
+.utabs{display:flex;gap:8px;margin-top:14px}
+.utabs span{font-size:16px;padding:7px 14px;border-radius:8px;background:#fff;border:1px solid var(--line);color:var(--muted)}
+.utabs span.on{background:var(--primary);color:#fff;border-color:var(--primary)}
+.tbl{position:absolute;left:28px;right:28px;top:130px;bottom:24px;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.tr{position:absolute;left:0;right:0;height:58px;display:flex;align-items:center;border-bottom:1px solid #EDF1F5;font-size:17px;padding:0 18px}
+.tr.th{top:0;height:44px;background:#F7F9FC;color:var(--muted);font-size:15px;font-weight:600}
+.tr > *{flex:none;white-space:nowrap;overflow:hidden}
+.c1{width:170px}.c2{width:150px;color:var(--primary);font-weight:600}.c3{width:220px;font-weight:600}.c4{flex:1 1 0 !important;color:var(--muted)}.c5{width:100px}.c6{width:120px;text-align:right;font-weight:600}
+.tr .badge{font-size:14px;padding:3px 9px}
+.trh{position:absolute;left:0;right:0;height:58px;background:#E8EFFB}
+.det{position:absolute;right:0;top:56px;bottom:0;width:820px;background:#fff;border-left:1px solid var(--line);box-shadow:-20px 0 50px rgba(20,43,69,.12)}
+.dh{position:absolute;left:0;right:0;top:0;height:110px;border-bottom:1px solid var(--line);padding:22px 32px}
+.dh small{font-size:16px;color:var(--muted)} .dh b{display:block;font-size:26px;font-weight:600;margin-top:4px}
+.dh .badge{position:absolute;right:28px;top:40px;font-size:16px}
+.dsec{position:absolute;left:32px;top:120px;font-size:15px;color:var(--muted);font-weight:600;letter-spacing:.06em}
+.ur{position:absolute;left:32px;right:32px;height:72px;border-bottom:1px solid #EDF1F5;display:flex;align-items:center;gap:16px}
+.ur .ic{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex:none}
+.ur .bd{flex:1;min-width:0} .ur b{font-size:19px;display:block} .ur span{font-size:16px;color:var(--muted);display:block;margin-top:3px;white-space:nowrap}
+.ur .rs{font-size:15px;font-weight:600;padding:4px 10px;border-radius:6px;flex:none}
+.udisc{position:absolute;left:32px;right:32px;top:432px;height:52px;display:flex;align-items:center;gap:10px;font-size:17px;font-weight:600;border-bottom:1px solid #EDF1F5}
+.udisc svg{font-size:18px;color:var(--muted)}
+.urec{position:absolute;left:32px;right:32px;top:500px;border-radius:10px;padding:18px 22px;background:var(--bad-bg);border:1px solid #F2C3BD;color:var(--bad)}
+.urec h3{font-size:24px} .urec p{font-size:16px;color:#6E2A22;margin-top:6px;line-height:1.5}
+.ufoot{position:absolute;left:0;right:0;bottom:0;height:72px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:flex-end;gap:12px;padding:0 28px;background:#fff}
+.ubtn{font-size:17px;font-weight:600;padding:10px 18px;border-radius:8px;border:1px solid var(--line);color:var(--text);background:#fff}
+.ubtn.pri{background:var(--primary);color:#fff;border-color:var(--primary)}
+.uth{position:absolute;left:40px;top:494px;width:171px;height:230px;overflow:hidden;border-radius:4px;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+.uth .paper{left:0;top:0;transform:scale(.3289);transform-origin:0 0;box-shadow:none}
+.cursor{position:absolute;width:30px;height:30px;z-index:20;transform-origin:4px 4px}
+.cursor svg{width:30px;height:30px;fill:#fff;stroke:#0B1726;stroke-width:1.4;filter:drop-shadow(0 2px 3px rgba(0,0,0,.45))}
+.callout{position:absolute;font-size:19px;font-weight:600;padding:9px 16px;border-radius:999px;background:#0B1726;color:#DCE6F2;border:1.5px solid #8DB0E6;box-shadow:0 10px 30px rgba(0,0,0,.35);white-space:nowrap;z-index:15}
+.callout::after{content:"";position:absolute;left:100%;top:50%;width:var(--l,60px);height:2px;background:#8DB0E6}
+.uinfo{position:absolute;left:32px;right:32px;top:112px;height:64px;display:flex;gap:34px;align-items:center;border-bottom:1px solid #EDF1F5}
+.uinfo small{display:block;font-size:14px;color:var(--muted)} .uinfo b{display:block;font-size:17px;font-weight:600;margin-top:2px}
+.upv{position:absolute;width:360px;height:485px;overflow:hidden;border-radius:8px;box-shadow:0 30px 70px rgba(0,0,0,.45);z-index:12}
+.upv .paper{left:0;top:0;transform:scale(.6923);transform-origin:0 0;box-shadow:none}
+.abox{position:absolute;left:66px;top:312px;width:228px;height:74px;border:3px solid var(--primary);border-radius:8px;background:rgba(24,73,169,.06)}
+.uchip{position:absolute;font-size:18px;font-weight:600;padding:9px 14px;border-radius:8px;background:#fff;color:var(--primary);box-shadow:0 10px 30px rgba(0,0,0,.3);white-space:nowrap;z-index:12}
+.ur.sm b{font-size:17px} .ur.sm span{font-size:14px} .ur.sm .ic{width:30px;height:30px;font-size:15px} .ur.sm .rs{font-size:13px;padding:3px 8px}
+.ur.flag{background:#FFF7F6;padding:0 12px;border-radius:8px;left:20px;right:20px}
+.c7{width:150px;position:relative;height:28px}
+.c7 .st0{position:absolute;left:0;top:3px;font-size:15px;color:var(--muted)} .c7 .st1{position:absolute;left:0;top:0;font-size:14px;padding:3px 9px}
+.mrec{position:absolute;left:32px;right:32px;border-radius:10px;padding:16px 22px;border:1px solid}
+.mrec h3{font-size:22px} .mrec p{font-size:16px;margin-top:5px}
+.mrec.ok{background:var(--ok-bg);border-color:#B7DCC6;color:var(--ok)} .mrec.ok p{color:#28553E}
+.mrec.warn{background:var(--warn-bg);border-color:#F0D2A4;color:var(--warn)} .mrec.warn p{color:#6B4B1E}
+.mrec.bad{background:var(--bad-bg);border-color:#F2C3BD;color:var(--bad)} .mrec.bad p{color:#6E2A22}
+.mnote{margin-right:auto;display:flex;align-items:center;gap:8px;font-size:16px;font-weight:600;padding:8px 12px;border-radius:8px}
+.mnote svg{font-size:16px}
+.ring{position:absolute;top:10px;height:52px;width:var(--w,150px);border-radius:10px;border:3px solid #4B7BDA;opacity:0}
+.mjc{position:absolute;width:500px;height:190px;background:#fff;color:var(--text);border-radius:16px;box-shadow:0 30px 70px rgba(0,0,0,.45);padding:28px 28px;display:flex;gap:20px}
+.mjc i{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;flex:none}
+.mjc b{display:block;font-size:26px} .mjc em{display:block;font-style:normal;font-size:14px;color:#8FA3BA;letter-spacing:.04em;margin-top:2px} .mjc span{display:block;font-size:18px;color:var(--muted);margin-top:12px;line-height:1.5}
+.draft{position:absolute;left:840px;top:230px;width:700px;background:#fff;border-radius:14px;box-shadow:0 30px 80px rgba(20,43,69,.35);border:1px solid var(--line);z-index:9;overflow:hidden}
+.dfh{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:600;padding:18px 24px;border-bottom:1px solid var(--line);color:var(--primary)}
+.dfh svg{font-size:20px}
+.dfl{font-size:17px;padding:14px 24px 0} .dfl small{color:var(--muted);margin-right:12px}
+.dfb{margin:12px 24px 0;border:1px solid var(--line);border-radius:10px;background:#F7F9FC;padding:16px 18px;height:156px}
+.dft{font-size:17px;line-height:1.75;color:var(--text)}
+.dff{display:flex;align-items:center;gap:10px;padding:16px 24px 18px}
+.dfn{margin-right:auto;font-size:15px;color:var(--muted)}
+#hud{position:fixed;left:12px;bottom:10px;color:#8894a6;font:12px/1.4 -apple-system,sans-serif;z-index:10;user-select:none}
+</style>
+</head>
+<body>
+<div id="stage">
+
+<section class="scene" id="s1"></section>
+
+<section class="scene" id="s2">
+  <div class="tx cap" id="s2a" style="top:300px">每 5 筆費用申請，</div>
+  <div class="sc" id="sc0" style="left:585px"><span data-i="file"></span><div class="ln"></div></div>
+  <div class="sc" id="sc1" style="left:745px"><span data-i="file"></span><div class="ln"></div></div>
+  <div class="sc" id="sc2" style="left:905px"><span data-i="file"></span><div class="ln"></div></div>
+  <div class="sc" id="sc3" style="left:1065px"><span data-i="file"></span><div class="ln"></div></div>
+  <div class="sc" id="sc4" style="left:1225px"><span data-i="file"></span><div class="ln"></div><div class="sc red" id="sc4r"><span data-i="x"></span><div class="ln" style="background:#7A2A22"></div></div></div>
+  <div class="tx cap" id="s2b" style="top:730px">就有近 1 筆有錯誤或缺漏。</div>
+  <div class="src" id="s2src">資料來源：GBTA Foundation（2015）</div>
+</section>
+
+<section class="scene" id="s3">
+  <div class="cam" id="wall"></div>
+  <div class="tx lg" id="s3a" style="top:480px">所以每一筆，都得有人看過。</div>
+  <div class="logo" id="logo4" style="top:400px"><div class="mark" id="mark4" data-i="check"></div><div class="word" id="word4">CheckMate</div></div>
+  <div class="tx" id="sub4" style="top:580px;font-size:32px;color:#B7C5D6;font-weight:500">AI 費用初審 Agent</div>
+</section>
+
+<section class="scene" id="r1">
+  <div class="tx kick" id="r1k" style="top:120px">HOW IT WORKS</div>
+  <div class="tx cap" id="r1c" style="top:165px">重複性的初審，交給 CheckMate。</div>
+  <div class="tx cap" id="r1d" style="top:165px">之後每一筆，都這樣跑完。</div>
+  <div id="r1fast"></div>
+  <div id="r1rail"></div>
+  <div class="case" id="ca" style="left:110px;top:330px"><small>EXP-2026-004</small><b>台南客戶專案訪談住宿</b><span class="badge o t-bad" id="caB" style="background:transparent">建議人工審核</span></div>
+  <div class="pop" id="cpop" style="left:390px;top:690px">
+    <div class="pr"><i class="ic" id="pk0" data-i="check"></i>金額核對<em>申請＝憑證</em></div>
+    <div class="pr"><i class="ic" id="pk1" data-i="check"></i>企業規範<em>未超過上限</em></div>
+    <div class="pr"><i class="ic" id="pk2" data-i="check"></i>憑證格式<em>符合</em></div>
+    <div class="pr"><i class="ic" id="pk3" data-i="check"></i>重複比對<em>無相同案件</em></div>
+    <div class="pr"><i class="ic" id="pk4" data-i="check"></i>情境合理性<em>行程相符</em></div>
+  </div>
+  <div class="toast t-warn" id="caCtl" style="left:1180px;top:690px"><span data-i="shield"></span>需人工判斷，不自動放行</div>
+  <div class="toast t-bad" id="caAct" style="left:1500px;top:760px"><span data-i="user"></span>已轉交人工審核・附審查依據</div>
+</section>
+
+
+<section class="scene" id="ui">
+  <div class="tx" id="uic" style="top:58px;font-size:38px">每一筆，都走同一套審查。</div>
+  <div class="tx" id="uic2" style="top:58px;font-size:38px">規則、情境、真偽，6 個面向一次查完。</div>
+  <div class="tx" id="uic3" style="top:58px;font-size:38px">結論和依據，一眼看懂。</div>
+  <div class="cam" id="uicam">
+    <div class="win" id="win" style="left:160px;top:140px;width:1600px;height:860px;transform-origin:800px 430px">
+      <div class="side"><div class="bm" data-i="check"></div><div class="ni" data-i="clip"></div></div>
+      <div class="topb"><span>財務工作台</span><span class="av">財</span><span>財務初審人員</span></div>
+      <div class="lst"><h2>案件初審<small>7 筆待處理</small></h2>
+        <div class="utabs"><span class="on">待處理 7</span><span>待補件 0</span><span>已完成初審 0</span><span>全部 7</span></div>
+        <div class="tbl"><div class="tr th"><span class="c1">初審建議</span><span class="c2" style="color:var(--muted)">案件編號</span><span class="c3">申報項目</span><span class="c4">Agent 摘要</span><span class="c5">申請人</span><span class="c6">申請金額</span></div>
+          <div class="trh" id="trh" style="top:218px"></div><div class="tr" id="tr0" style="top:44px"><span class="c1"><span class="badge t-ok">建議通過</span></span><span class="c2">EXP-2026-001</span><span class="c3">台中客戶拜訪住宿</span><span class="c4">資料齊全，核對無誤</span><span class="c5">陳怡安</span><span class="c6">NT$2,400</span></div><div class="tr" id="tr1" style="top:102px"><span class="c1"><span class="badge t-warn">建議補件</span></span><span class="c2">EXP-2026-002</span><span class="c3">高雄展會支援住宿</span><span class="c4">缺少住宿憑證</span><span class="c5">林子晴</span><span class="c6">NT$2,800</span></div><div class="tr" id="tr2" style="top:160px"><span class="c1"><span class="badge t-bad">建議人工審核</span></span><span class="c2">EXP-2026-003</span><span class="c3">新竹供應商會議交通</span><span class="c4">申請金額比憑證多 NT$200</span><span class="c5">王柏翰</span><span class="c6">NT$1,680</span></div><div class="tr" id="tr3" style="top:218px"><span class="c1"><span class="badge t-bad">建議人工審核</span></span><span class="c2">EXP-2026-004</span><span class="c3">台南客戶專案訪談住宿</span><span class="c4">住宿費超出企業上限 NT$1,200</span><span class="c5">張雅婷</span><span class="c6">NT$4,200</span></div><div class="tr" id="tr4" style="top:276px"><span class="c1"><span class="badge t-bad">建議人工審核</span></span><span class="c2">EXP-2026-005</span><span class="c3">台中設計工作坊交通</span><span class="c4">與 EXP-2026-018 疑似重複</span><span class="c5">李承恩</span><span class="c6">NT$1,490</span></div><div class="tr" id="tr5" style="top:334px"><span class="c1"><span class="badge t-bad">建議人工審核</span></span><span class="c2">EXP-2026-007</span><span class="c3">研究專案材料採購</span><span class="c4">費用類別尚無對應規範</span><span class="c5">周宇辰</span><span class="c6">NT$1,800</span></div><div class="tr" id="tr6" style="top:392px"><span class="c1"><span class="badge t-warn">建議補件</span></span><span class="c2">EXP-2026-008</span><span class="c3">台中客戶拜訪住宿及交通</span><span class="c4">交通費 NT$480 未附憑證</span><span class="c5">林子晴</span><span class="c6">NT$3,280</span></div></div>
+      </div>
+      <div class="det" id="det">
+        <div class="dh"><small>EXP-2026-004</small><b>台南客戶專案訪談住宿</b><span class="badge t-bad">建議人工審核</span></div>
+        <div class="uinfo" id="uinfo"><div><small>申請人</small><b>張雅婷 ・ 業務部</b></div><div><small>消費日期</small><b>2026-09-18</b></div><div><small>費用類型</small><b>住宿費 1 晚</b></div><div><small>申請金額</small><b>NT$4,200</b></div></div>
+        <div class="dsec" style="top:184px">審查結果 ・ 6 個面向</div><div class="ur sm" id="ur0" style="top:208px;height:50px"><i class="ic t-ok" id="uri0" data-i="check"></i><div class="bd"><b>申請與憑證核對</b><span>申請 NT$4,200 ＝ 憑證 NT$4,200</span></div><span class="rs t-ok">未見異常</span></div><div class="ur sm" id="ur1" style="top:258px;height:50px"><i class="ic t-bad" id="uri1" data-i="x"></i><div class="bd"><b>企業規範</b><span>超出每晚上限 NT$1,200 ・ 本次 NT$4,200，上限 NT$3,000</span></div><span class="rs t-bad">需確認</span></div><div class="ur sm" id="ur2" style="top:308px;height:50px"><i class="ic t-ok" id="uri2" data-i="check"></i><div class="bd"><b>憑證格式（法規）</b><span>已核對統一編號欄位</span></div><span class="rs t-ok">未見異常</span></div><div class="ur sm" id="ur3" style="top:358px;height:50px"><i class="ic t-ok" id="uri3" data-i="check"></i><div class="bd"><b>重複申報比對</b><span>比對既有案件，未發現相同</span></div><span class="rs t-ok">未見異常</span></div><div class="ur sm" id="ur4" style="top:408px;height:50px"><i class="ic t-ok" id="uri4" data-i="check"></i><div class="bd"><b>情境合理性</b><span>出差行程與消費地點相符</span></div><span class="rs t-ok">未見異常</span></div><div class="ur sm" id="ur5" style="top:458px;height:50px"><i class="ic t-ok" id="uri5" data-i="check"></i><div class="bd"><b>憑證真偽風險</b><span>版型與同商家憑證一致</span></div><span class="rs t-ok">未見異常</span></div>
+        <div class="udisc" id="udisc" style="top:512px;height:48px"><span data-i="chev"></span>憑證比對<span style="margin-left:auto;font-size:15px;color:var(--muted);font-weight:500">EV-004 ・ 南方旅店（模擬）</span></div>
+        <div class="urec" id="urec" style="top:572px"><h3>建議人工審核</h3><p>住宿費超出企業上限，需由財務確認是否有核准的例外。<br>適用規範：P-01 國內住宿每晚 NT$3,000</p></div>
+        <div class="ufoot"><span class="ubtn">退回補件</span><span class="ubtn pri">人工確認通過</span></div>
+      </div>
+    </div>
+    <div class="upv" id="upv" style="left:500px;top:330px"><div class="paper"><div class="tag">展示用模擬憑證</div><div class="v">南方旅店（模擬）</div><div class="s">住宿收據</div><div class="ln"><span>憑證編號</span><span>EV-004</span></div><div class="ln"><span>入住日期</span><span>2026-09-18</span></div><div class="ln"><span>房型</span><span>標準雙人房 1 晚</span></div><div class="pamt"><small>合計新台幣</small>NT$4,200</div></div><div class="abox" id="abox"></div></div>
+    <div class="uchip" id="uchip" style="left:500px;top:832px">憑證 EV-004 ・ 合計 NT$4,200 ・ 與申請金額一致</div>
+    <div class="callout" id="co1" style="left:690px;top:812px;--l:62px">建議 ・ Agent 判斷</div>
+    <div class="callout" id="co2" style="left:690px;top:945px;--l:62px">動作 ・ 由財務決定</div>
+    <div class="cursor" id="cur" style="left:1300px;top:860px"><svg viewBox="0 0 24 24"><path d="M4.037 4.688a.495.495 0 0 1 .651-.651l16 6.5a.5.5 0 0 1-.063.947l-6.124 1.58a2 2 0 0 0-1.438 1.435l-1.579 6.126a.5.5 0 0 1-.947.063z"/></svg></div>
+  </div>
+</section>
+<section class="scene" id="um">
+  <div class="tx" id="umc1" style="top:58px;font-size:38px">每一種狀況，都有對應的處理。</div>
+  <div class="tx" id="umc2" style="top:58px;font-size:38px">不只看規則，更能理解情境並抓出異常。</div>
+  <div class="cam" id="umcam">
+    <div class="win" id="win2" style="left:160px;top:140px;width:1600px;height:860px">
+      <div class="side"><div class="bm" data-i="check"></div><div class="ni" data-i="clip"></div></div>
+      <div class="topb"><span>財務工作台</span><span class="av">財</span><span>財務初審人員</span></div>
+      <div class="lst"><h2>案件初審<small><span id="umN">6</span> 筆待處理</small></h2>
+        <div class="utabs"><span class="on">全部 6</span></div>
+        <div class="tbl"><div class="tr th"><span class="c1">初審建議</span><span class="c2" style="color:var(--muted)">案件編號</span><span class="c3">申報項目</span><span class="c7">處理狀態</span><span class="c4">Agent 摘要</span></div>
+          <div class="trh" id="umh" style="top:44px"></div><div class="tr" id="mr0" style="top:44px"><span class="c1"><span class="badge t-ok">建議通過</span></span><span class="c2">EXP-2026-001</span><span class="c3">台中客戶拜訪住宿</span><span class="c7"><span class="st0" id="mz0">待處理</span><span class="badge t-ok st1" id="ms0">已完成初審</span></span><span class="c4">資料齊全，核對無誤</span></div><div class="tr" id="mr1" style="top:102px"><span class="c1"><span class="badge t-warn">建議補件</span></span><span class="c2">EXP-2026-002</span><span class="c3">高雄展會支援住宿</span><span class="c7"><span class="st0" id="mz1">待處理</span><span class="badge t-warn st1" id="ms1">待補件</span></span><span class="c4">缺少住宿憑證</span></div><div class="tr" id="mr2" style="top:160px"><span class="c1"><span class="badge t-bad">建議人工審核</span></span><span class="c2">EXP-2026-003</span><span class="c3">新竹供應商會議交通</span><span class="c7"><span class="st0" id="mz2">待處理</span><span class="badge t-warn st1" id="ms2">待補件</span></span><span class="c4">申請金額比憑證多 NT$200</span></div><div class="tr" id="mr3" style="top:218px"><span class="c1"><span class="badge t-bad">建議人工審核</span></span><span class="c2">EXP-2026-005</span><span class="c3">台中設計工作坊交通</span><span class="c7"><span class="st0" id="mz3">待處理</span><span class="badge t-warn st1" id="ms3">待補件</span></span><span class="c4">與 EXP-2026-018 疑似重複</span></div><div class="tr" id="mr4" style="top:276px"><span class="c1"><span class="badge t-bad">建議人工審核</span></span><span class="c2">EXP-2026-011</span><span class="c3">新竹供應商年度會議交通</span><span class="c7"><span class="st0" id="mz4">待處理</span><span class="badge t-ok st1" id="ms4">已完成初審</span></span><span class="c4">出差地點與消費地點不符</span></div><div class="tr" id="mr5" style="top:334px"><span class="c1"><span class="badge t-bad">建議人工審核</span></span><span class="c2">EXP-2026-012</span><span class="c3">港都餐飲客戶餐敘</span><span class="c7"><span class="st0" id="mz5">待處理</span><span class="badge t-bad st1" id="ms5">已轉交</span></span><span class="c4">憑證版型與歷史憑證不一致</span></div></div>
+      </div>
+      <div class="det" id="md0"><div class="dh"><small>EXP-2026-001</small><b>台中客戶拜訪住宿</b><span class="badge t-ok">建議通過</span></div>
+      <div class="dsec" style="top:122px">審查結果 ・ 6 個面向</div><div class="ur sm"  style="top:150px;height:54px"><i class="ic t-ok" data-i="check"></i><div class="bd"><b>申請與憑證核對</b><span>申請＝憑證金額</span></div><span class="rs t-ok">未見異常</span></div><div class="ur sm"  style="top:204px;height:54px"><i class="ic t-ok" data-i="check"></i><div class="bd"><b>企業規範</b><span>未超過類別上限</span></div><span class="rs t-ok">未見異常</span></div><div class="ur sm"  style="top:258px;height:54px"><i class="ic t-ok" data-i="check"></i><div class="bd"><b>憑證格式（法規）</b><span>已核對統一編號欄位</span></div><span class="rs t-ok">未見異常</span></div><div class="ur sm"  style="top:312px;height:54px"><i class="ic t-ok" data-i="check"></i><div class="bd"><b>重複申報比對</b><span>未發現相同案件</span></div><span class="rs t-ok">未見異常</span></div><div class="ur sm"  style="top:366px;height:54px"><i class="ic t-ok" data-i="check"></i><div class="bd"><b>情境合理性</b><span>行程與消費地點相符</span></div><span class="rs t-ok">未見異常</span></div><div class="ur sm"  style="top:420px;height:54px"><i class="ic t-ok" data-i="check"></i><div class="bd"><b>憑證真偽風險</b><span>版型與同商家憑證一致</span></div><span class="rs t-ok">未見異常</span></div>
+      <div class="mrec ok" id="mc0" style="top:486px"><h3>建議通過</h3><p>6 項檢查皆未見異常，可完成初審。</p></div>
+      <div class="ufoot"><span class="mnote t-ok" id="mn0"><span data-i="check"></span>已完成初審 ・ 送往下一審核節點</span><span class="ubtn" id="mb00">退回補件</span><span class="ubtn pri" id="mb01">完成初審</span><span class="ring" id="mg0" style="right:24px;--w:114px"></span></div></div><div class="det" id="md1"><div class="dh"><small>EXP-2026-002</small><b>高雄展會支援住宿</b><span class="badge t-warn">建議補件</span></div>
+      <div class="dsec" style="top:122px">審查結果 ・ 6 個面向</div><div class="ur sm flag" id=mf1 style="top:150px;height:54px"><i class="ic t-warn" data-i="alert"></i><div class="bd"><b>申請與憑證核對</b><span>缺少住宿憑證，無法核對金額</span></div><span class="rs t-warn">缺件</span></div><div class="ur sm"  style="top:204px;height:54px"><i class="ic t-ok" data-i="check"></i><div class="bd"><b>企業規範</b><span>未超過類別上限</span></div><span class="rs t-ok">未見異常</span></div><div class="ur sm"  style="top:258px;height:54px"><i class="ic t-ok" data-i="check"></i><div class="bd"><b>憑證格式（法規）</b><span>已核對統一編號欄位</span></div><span class="rs t-ok">未見異常</span></div><div class="ur sm"  style="top:312px;height:54px"><i class="ic t-ok" data-i="check"></i><div class="bd"><b>重複申報比對</b><span>未發現相同案件</span></div><span class="rs t-ok">未見異常</span></div><div class="ur sm"  style="top:366px;height:54px"><i class="ic t-ok" data-i="check"></i><div class="bd"><b>情境合理性</b><span>行程與消費地點相符</span></div><span class="rs t-ok">未見異常</span></div><div class="ur sm"  style="top:420px;height:54px"><i class="ic t-ok" data-i="check"></i><div class="bd"><b>憑證真偽風險</b><span>版型與同商家憑證一致</span></div><span class="rs t-ok">未見異常</span></div>
+      <div class="mrec warn" id="mc1" style="top:486px"><h3>建議補件</h3><p>請申請人補充住宿憑證。依據 P-02 住宿費須附憑證。</p></div>
+      <div class="ufoot"><span class="mnote t-warn" id="mn1"><span data-i="mail"></span>已通知申請人補件</span><span class="ubtn pri" id="mb10">退回補件</span><span class="ubtn" id="mb11">人工確認通過</span><span class="ring" id="mg1" style="right:176px;--w:114px"></span></div></div><div class="det" id="md2"><div class="dh"><small>EXP-2026-003</small><b>新竹供應商會議交通</b><span class="badge t-bad">建議人工審核</span></div>
+      <div class="dsec" style="top:122px">審查結果 ・ 6 個面向</div><div class="ur sm flag" id=mf2 style="top:150px;height:54px"><i class="ic t-bad" data-i="x"></i><div class="bd"><b>申請與憑證核對</b><span>申請 NT$1,680，憑證 NT$1,480，差 NT$200</span></div><span class="rs t-bad">需確認</span></div><div class="ur sm"  style="top:204px;height:54px"><i class="ic t-ok" data-i="check"></i><div class="bd"><b>企業規範</b><span>未超過類別上限</span></div><span class="rs t-ok">未見異常</span></div><div class="ur sm"  style="top:258px;height:54px"><i class="ic t-ok" data-i="check"></i><div class="bd"><b>憑證格式（法規）</b><span>已核對統一編號欄位</span></div><span class="rs t-ok">未見異常</span></div><div class="ur sm"  style="top:312px;height:54px"><i class="ic t-ok" data-i="check"></i><div class="bd"><b>重複申報比對</b><span>未發現相同案件</span></div><span class="rs t-ok">未見異常</span></div><div class="ur sm"  style="top:366px;height:54px"><i class="ic t-ok" data-i="check"></i><div class="bd"><b>情境合理性</b><span>行程與消費地點相符</span></div><span class="rs t-ok">未見異常</span></div><div class="ur sm"  style="top:420px;height:54px"><i class="ic t-ok" data-i="check"></i><div class="bd"><b>憑證真偽風險</b><span>版型與同商家憑證一致</span></div><span class="rs t-ok">未見異常</span></div>
+      <div class="mrec bad" id="mc2" style="top:486px"><h3>建議人工審核</h3><p>金額不一致，需確認差額原因。依據 E-01 申請與憑證須一致。</p></div>
+      <div class="ufoot"><span class="mnote t-warn" id="mn2"><span data-i="mail"></span>已退回 ・ 請補差額說明</span><span class="ubtn pri" id="mb20">退回補件</span><span class="ubtn" id="mb21">人工確認通過</span><span class="ring" id="mg2" style="right:176px;--w:114px"></span></div></div><div class="det" id="md3"><div class="dh"><small>EXP-2026-005</small><b>台中設計工作坊交通</b><span class="badge t-bad">建議人工審核</span></div>
+      <div class="dsec" style="top:122px">審查結果 ・ 6 個面向</div><div class="ur sm"  style="top:150px;height:54px"><i class="ic t-ok" data-i="check"></i><div class="bd"><b>申請與憑證核對</b><span>申請＝憑證金額</span></div><span class="rs t-ok">未見異常</span></div><div class="ur sm"  style="top:204px;height:54px"><i class="ic t-ok" data-i="check"></i><div class="bd"><b>企業規範</b><span>未超過類別上限</span></div><span class="rs t-ok">未見異常</span></div><div class="ur sm"  style="top:258px;height:54px"><i class="ic t-ok" data-i="check"></i><div class="bd"><b>憑證格式（法規）</b><span>已核對統一編號欄位</span></div><span class="rs t-ok">未見異常</span></div><div class="ur sm flag" id=mf3 style="top:312px;height:54px"><i class="ic t-bad" data-i="x"></i><div class="bd"><b>重複申報比對</b><span>與 EXP-2026-018 申請人、日期、金額、商家相同</span></div><span class="rs t-bad">需確認</span></div><div class="ur sm"  style="top:366px;height:54px"><i class="ic t-ok" data-i="check"></i><div class="bd"><b>情境合理性</b><span>行程與消費地點相符</span></div><span class="rs t-ok">未見異常</span></div><div class="ur sm"  style="top:420px;height:54px"><i class="ic t-ok" data-i="check"></i><div class="bd"><b>憑證真偽風險</b><span>版型與同商家憑證一致</span></div><span class="rs t-ok">未見異常</span></div>
+      <div class="mrec bad" id="mc3" style="top:486px"><h3>建議人工審核</h3><p>疑似重複申報，不代表已認定重複。</p></div>
+      <div class="ufoot"><span class="mnote t-warn" id="mn3"><span data-i="mail"></span>已退回 ・ 請說明是否重複</span><span class="ubtn pri" id="mb30">退回補件</span><span class="ubtn" id="mb31">人工確認通過</span><span class="ring" id="mg3" style="right:176px;--w:114px"></span></div></div><div class="det" id="md4"><div class="dh"><small>EXP-2026-011</small><b>新竹供應商年度會議交通</b><span class="badge t-bad">建議人工審核</span></div>
+      <div class="dsec" style="top:122px">審查結果 ・ 6 個面向</div><div class="ur sm"  style="top:150px;height:54px"><i class="ic t-ok" data-i="check"></i><div class="bd"><b>申請與憑證核對</b><span>申請＝憑證金額</span></div><span class="rs t-ok">未見異常</span></div><div class="ur sm"  style="top:204px;height:54px"><i class="ic t-ok" data-i="check"></i><div class="bd"><b>企業規範</b><span>未超過類別上限</span></div><span class="rs t-ok">未見異常</span></div><div class="ur sm"  style="top:258px;height:54px"><i class="ic t-ok" data-i="check"></i><div class="bd"><b>憑證格式（法規）</b><span>已核對統一編號欄位</span></div><span class="rs t-ok">未見異常</span></div><div class="ur sm"  style="top:312px;height:54px"><i class="ic t-ok" data-i="check"></i><div class="bd"><b>重複申報比對</b><span>未發現相同案件</span></div><span class="rs t-ok">未見異常</span></div><div class="ur sm flag" id=mf4 style="top:366px;height:54px"><i class="ic t-bad" data-i="x"></i><div class="bd"><b>情境合理性</b><span>出差行程在新竹，憑證消費地點在高雄</span></div><span class="rs t-bad">需確認</span></div><div class="ur sm"  style="top:420px;height:54px"><i class="ic t-ok" data-i="check"></i><div class="bd"><b>憑證真偽風險</b><span>版型與同商家憑證一致</span></div><span class="rs t-ok">未見異常</span></div>
+      <div class="mrec bad" id="mc4" style="top:486px"><h3>建議人工審核</h3><p>情境風險，請確認是否為行程異動。系統不判定違規。</p></div>
+      <div class="ufoot"><span class="mnote t-ok" id="mn4"><span data-i="check"></span>已人工確認通過 ・ 附說明：行程異動</span><span class="ubtn" id="mb40">退回補件</span><span class="ubtn pri" id="mb41">人工確認通過</span><span class="ring" id="mg4" style="right:24px;--w:148px"></span></div></div><div class="det" id="md5"><div class="dh"><small>EXP-2026-012</small><b>港都餐飲客戶餐敘</b><span class="badge t-bad">建議人工審核</span></div>
+      <div class="dsec" style="top:122px">審查結果 ・ 6 個面向</div><div class="ur sm"  style="top:150px;height:54px"><i class="ic t-ok" data-i="check"></i><div class="bd"><b>申請與憑證核對</b><span>申請＝憑證金額</span></div><span class="rs t-ok">未見異常</span></div><div class="ur sm"  style="top:204px;height:54px"><i class="ic t-ok" data-i="check"></i><div class="bd"><b>企業規範</b><span>未超過類別上限</span></div><span class="rs t-ok">未見異常</span></div><div class="ur sm"  style="top:258px;height:54px"><i class="ic t-ok" data-i="check"></i><div class="bd"><b>憑證格式（法規）</b><span>已核對統一編號欄位</span></div><span class="rs t-ok">未見異常</span></div><div class="ur sm"  style="top:312px;height:54px"><i class="ic t-ok" data-i="check"></i><div class="bd"><b>重複申報比對</b><span>未發現相同案件</span></div><span class="rs t-ok">未見異常</span></div><div class="ur sm"  style="top:366px;height:54px"><i class="ic t-ok" data-i="check"></i><div class="bd"><b>情境合理性</b><span>行程與消費地點相符</span></div><span class="rs t-ok">未見異常</span></div><div class="ur sm flag" id=mf5 style="top:420px;height:54px"><i class="ic t-bad" data-i="x"></i><div class="bd"><b>憑證真偽風險</b><span>版型與同商家歷史憑證不一致</span></div><span class="rs t-bad">需確認</span></div>
+      <div class="mrec bad" id="mc5" style="top:486px"><h3>建議人工審核</h3><p>真偽風險訊號，系統不做偽造認定。</p></div>
+      <div class="ufoot"><span class="mnote t-bad" id="mn5"><span data-i="user"></span>已轉交進一步審查</span><span class="ubtn" id="mb50">退回補件</span><span class="ubtn pri" id="mb51">轉交進一步審查</span><span class="ring" id="mg5" style="right:24px;--w:165px"></span></div></div>
+    <div class="draft" id="dft"><div class="dfh"><span data-i="mail"></span>退回補件 ・ CheckMate 已擬好通知</div>
+        <div class="dfl"><small>收件人</small>林子晴（行銷部）</div>
+        <div class="dfb"><div class="dft" id="dftx">林子晴您好：<br>您申請的 EXP-2026-002「高雄展會支援住宿」缺少住宿憑證，<br>請補上傳住宿收據後重新送出。<br>依據：P-02 住宿費須檢附住宿憑證。</div></div>
+        <div class="dff"><span class="dfn">可直接編輯後送出</span><span class="ubtn">編輯</span><span class="ubtn pri" id="dfs">送出補件通知</span></div></div>
+    </div>
+    <div class="cursor" id="cur2" style="left:1300px;top:900px"><svg viewBox="0 0 24 24"><path d="M4.037 4.688a.495.495 0 0 1 .651-.651l16 6.5a.5.5 0 0 1-.063.947l-6.124 1.58a2 2 0 0 0-1.438 1.435l-1.579 6.126a.5.5 0 0 1-.947.063z"/></svg></div>
+  </div>
+</section>
+<section class="scene" id="mj">
+  <div class="tx kick" id="mjk" style="top:200px">降低誤判與漏判</div>
+  <div class="tx" id="mjt" style="top:240px;font-size:54px">六道控制，AI 不會自己說了算。</div>
+  <div class="mjc" id="mj0" style="left:170px;top:392px"><i class="t-info" data-i="list"></i><div><b>必要檢核</b><em>Required Checks</em><span>每個面向都要有結果，沒查完不給建議。</span></div></div><div class="mjc" id="mj1" style="left:710px;top:392px"><i class="t-info" data-i="shield"></i><div><b>強制防護</b><em>Hard Guardrails</em><span>超額、超出授權等紅線，一律攔下。</span></div></div><div class="mjc" id="mj2" style="left:1250px;top:392px"><i class="t-info" data-i="check2"></i><div><b>獨立驗證</b><em>Independent Verification</em><span>放行前，再由另一道檢查確認一次。</span></div></div><div class="mjc" id="mj3" style="left:170px;top:612px"><i class="t-info" data-i="link"></i><div><b>佐證鏈</b><em>Evidence Chain</em><span>每個判斷都連回規則與憑證，隨時回查。</span></div></div><div class="mjc" id="mj4" style="left:710px;top:612px"><i class="t-info" data-i="steps"></i><div><b>漸進式自動化</b><em>Progressive Automation</em><span>先授權低風險案件，驗證後再逐步放寬。</span></div></div><div class="mjc" id="mj5" style="left:1250px;top:612px"><i class="t-info" data-i="history"></i><div><b>執行後監控</b><em>Post-action Monitoring</em><span>放行後持續追蹤結果，有異常就調整授權。</span></div></div>
+</section>
+<section class="scene" id="ev">
+  <div class="cam" id="evcam" style="transform-origin:960px 645px">
+    <div class="paper"><div class="tag">展示用模擬憑證</div><div class="v">南方旅店（模擬）</div><div class="s">住宿收據</div>
+      <div class="ln"><span>憑證編號</span><span>EV-004</span></div><div class="ln"><span>入住日期</span><span>2026-09-18</span></div><div class="ln"><span>房型</span><span>標準雙人房 1 晚</span></div>
+      <div class="pamt" id="pamt"><small>合計新台幣</small>NT$4,200</div></div>
+  </div>
+  <div class="panel" id="evp" style="left:410px;top:250px;width:1100px;height:560px">
+    <div class="ph"><div class="cid">EXP-2026-004 ・ 張雅婷 ・ 業務部</div><div class="ttl">台南客戶專案訪談住宿</div></div>
+    <div class="limlbl" style="left:40px;top:158px;color:var(--muted)">本次住宿（每晚）</div>
+    <div class="bartrack"><div class="bar" id="evbar"></div><div class="over" id="evover"></div><div class="limit"></div></div>
+    <div class="limlbl" id="evlim" style="left:560px;top:158px;color:var(--text)">企業上限 NT$3,000</div>
+    <div class="frow" id="evrow"><div class="ic t-bad" data-i="x"></div><div><b>企業規範</b><span>超出住宿上限 NT$1,200</span></div><div class="res t-bad">需確認</div></div>
+    <div class="abs" id="evchips" style="left:40px;top:420px;display:flex;gap:14px"><span class="chip">依據 <b>P-01</b> 國內住宿每晚上限 NT$3,000</span><span class="chip">憑證 <b>EV-004</b></span></div>
+  </div>
+  <div class="amt" id="amt"><span id="amtD" style="color:#293241">NT$4,200</span><span id="amtR" style="color:var(--bad)">NT$4,200</span></div>
+</section>
+
+<section class="scene" id="dup">
+  <div class="dc" id="dl" style="left:700px"><div class="cid">本案</div><div class="ttl">EXP-2026-005</div>
+    <div class="df" style="top:100px"><div class="hl" id="dlh0"></div><small>申請人</small><b>李承恩</b></div>
+    <div class="df" style="top:156px"><div class="hl" id="dlh1"></div><small>消費日期</small><b>2026-09-18</b></div>
+    <div class="df" style="top:212px"><div class="hl" id="dlh2"></div><small>金額</small><b>NT$1,490</b></div>
+    <div class="df" style="top:268px"><div class="hl" id="dlh3"></div><small>商家</small><b>城際鐵路（模擬）</b></div></div>
+  <div class="dc" id="dr" style="left:760px;z-index:2"><div class="cid">既有案件 ・ 09/20 已申報</div><div class="ttl">EXP-2026-018</div>
+    <div class="df" style="top:100px"><div class="hl" id="drh0"></div><small>申請人</small><b>李承恩</b></div>
+    <div class="df" style="top:156px"><div class="hl" id="drh1"></div><small>消費日期</small><b>2026-09-18</b></div>
+    <div class="df" style="top:212px"><div class="hl" id="drh2"></div><small>金額</small><b>NT$1,490</b></div>
+    <div class="df" style="top:268px"><div class="hl" id="drh3"></div><small>商家</small><b>城際鐵路（模擬）</b></div></div>
+  <div class="link" id="dk0" style="left:740px;top:455px;width:440px"></div>
+  <div class="link" id="dk1" style="left:740px;top:511px;width:440px"></div>
+  <div class="link" id="dk2" style="left:740px;top:567px;width:440px"></div>
+  <div class="link" id="dk3" style="left:740px;top:623px;width:440px"></div>
+  <div class="pill t-bad" id="dupT" style="left:640px;top:730px">疑似重複申報 ・ 比對 EXP-2026-018</div>
+</section>
+
+<section class="scene" id="bs">
+  <div class="tx cap" id="bsc" style="top:260px">每個判斷，都查得到依據。</div>
+  <div class="bc" id="bc0" style="left:240px"><div class="h"><i class="t-warn" data-i="alert"></i>缺少住宿憑證</div><div class="d">EXP-2026-002 ・ 建議補件</div>
+    <div class="bchip">依據 P-02 住宿費須附憑證</div><div class="bchip on" id="bl0">依據 P-02 住宿費須附憑證</div></div>
+  <div class="bc" id="bc1" style="left:740px"><div class="h"><i class="t-bad" data-i="x"></i>超出住宿上限</div><div class="d">EXP-2026-004 ・ 建議人工審核</div>
+    <div class="bchip">依據 P-01 ・ 憑證 EV-004</div><div class="bchip on" id="bl1">依據 P-01 ・ 憑證 EV-004</div></div>
+  <div class="bc" id="bc2" style="left:1240px"><div class="h"><i class="t-bad" data-i="x"></i>疑似重複申報</div><div class="d">EXP-2026-005 ・ 建議人工審核</div>
+    <div class="bchip">比對 EXP-2026-018</div><div class="bchip on" id="bl2">比對 EXP-2026-018</div></div>
+</section>
+
+<section class="scene" id="br">
+  <div class="checks4"><span id="ck0"><i data-i="check"></i>金額一致</span><span id="ck1"><i data-i="check"></i>未超額</span><span id="ck2"><i data-i="check"></i>格式合規</span><span id="ck3"><i data-i="check"></i>無重複</span></div>
+</section>
+<section class="scene" id="odd"><div class="tx xl" id="oddT" style="top:470px">但這筆，有點不對勁。</div></section>
+
+<section class="scene" id="ctx">
+  <div class="tx cap" id="ctxc" style="top:190px">不只看規則，更能理解情境並抓出異常。</div>
+  <div class="loc" id="lA" style="left:320px"><div class="k"><span data-i="briefcase"></span>出差行程（申請資料）</div><div class="city"><span data-i="pin"></span>新竹</div><div class="d">09/18 供應商年度會議</div></div>
+  <div class="loc" id="lB" style="left:1040px"><div class="k"><span data-i="receipt"></span>憑證消費地點</div><div class="city" style="color:var(--bad)"><span data-i="pin"></span>高雄</div><div class="d">09/18 高雄站前客運（模擬）</div></div>
+  <div class="dash" id="cdash" style="left:880px;width:160px"></div>
+  <div class="dashlbl" id="cdl" style="left:860px;width:200px">同一天<br>不同城市</div>
+  <div class="pill t-bad" id="ctxT" style="left:690px;top:700px">情境風險 ・ 建議人工審核</div>
+</section>
+
+<section class="scene" id="ctl">
+  <div class="tx cap" id="ctlc1" style="top:165px">AI 說可以，不代表直接放行。</div>
+  <div class="tx cap" id="ctlc2" style="top:165px">只有在授權範圍內，Agent 才會執行。</div>
+  <div id="r2rail"></div>
+  <div class="case" id="cb" style="left:110px;top:330px"><small>EXP-2026-015</small><b>年度軟體授權 NT$48,000</b><span class="badge o t-ok" id="cbB" style="background:transparent">建議通過</span></div>
+  <div class="bar-gate" id="gate" style="left:1479px;top:425px"></div>
+  <div class="why" id="why" style="left:1370px;top:668px">超出 Agent 授權範圍</div>
+  <div class="toast t-bad" id="cbAct" style="left:1480px;top:776px"><span data-i="user"></span>已轉交人工審核</div>
+  <div class="log" id="lg0" style="top:880px">10:32:04 <b>Agent</b> ・ 完成審查 ・ 建議通過 ・ EXP-2026-015</div>
+  <div class="log" id="lg1" style="top:912px">10:32:04 <b>控制</b> ・ 超出授權範圍，未執行</div>
+  <div class="log" id="lg2" style="top:944px">10:32:05 <b>Agent</b> ・ 轉交人工審核 ・ 附審查紀錄</div>
+</section>
+
+<section class="scene" id="qs">
+  <div id="r3rail"></div>
+  <div id="qcards"></div>
+  <div class="tx kick" id="qk" style="top:390px">待你判斷</div>
+</section>
+
+<section class="scene" id="pay"><div class="tx lg" id="payT" style="top:480px">把時間，留給真正需要判斷的事。</div></section>
+
+<section class="scene" id="end">
+  <div class="logo" id="logo9" style="top:380px"><div class="mark" data-i="check"></div><div class="word">CheckMate</div></div>
+  <div class="tx" id="slo9" style="top:570px;font-size:40px;font-weight:600;color:#DCE6F2">Your AI mate for smarter checks.</div>
+  <div class="tx" id="foot9" style="top:1000px;font-size:16px;color:#5F7591;font-weight:500">示意影片 ・ 畫面、案件與規則皆為模擬資料</div>
+</section>
+
+</div>
+<div id="hud"></div>
+<script>
+const ICONS = {
+  check:'<path d="M20 6 9 17l-5-5"/>', x:'<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+  alert:'<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+  pin:'<path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/>',
+  receipt:'<path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5v-11"/>',
+  briefcase:'<path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/>',
+  send:'<path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/>',
+  mail:'<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
+  user:'<circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/>',
+  shield:'<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>',
+  inbox:'<polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>',
+  search:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+  msg:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+  play:'<polygon points="6 3 20 12 6 21 6 3"/>',
+  clip:'<rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>',
+  history:'<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>',
+  list:'<path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/>',
+  check2:'<path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/>',
+  link:'<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+  steps:'<path d="M3 20h4v-5h4v-5h4V5h6"/>',
+  chev:'<path d="m9 18 6-6-6-6"/>',
+  file:'<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/>',
+};
+const svg = n => `<svg class="i" viewBox="0 0 24 24">${ICONS[n]}</svg>`;
+const $ = id => document.getElementById(id);
+
+/* rail builder */
+const SX = [260, 610, 960, 1310, 1660], RY = 520;
+const ST = [['inbox', '進件', '申請與憑證'], ['search', '審查', '規則＋情境'], ['msg', '建議', '通過・補件・人工'], ['shield', '控制', '授權範圍'], ['play', '動作', '送出・補件・轉人工']];
+function rail(p) {
+  let h = `<div class="rl" id="${p}l" style="left:160px;top:${RY - 1}px;width:1600px"></div>`;
+  ST.forEach(([ic, l, s], i) => {
+    const tag = i === 2 ? '<em class="tg o">判斷</em>' : i === 4 ? '<em class="tg s">執行</em>' : '';
+    h += `<div class="st" id="${p}s${i}" style="left:${SX[i] - 36}px;top:${RY - 36}px"><div class="node">${svg(ic)}</div><div class="node on" id="${p}a${i}">${svg(ic)}</div>${i === 3 ? `<div class="node no" id="${p}n${i}">${svg('x')}</div>` : ''}</div>
+      <div class="stl" id="${p}t${i}" style="left:${SX[i] - 120}px;top:${RY + 52}px"><b>${l}${tag}</b><small>${s}</small></div>`;
+  });
+  $(p + 'rail').outerHTML = h;
+}
+rail('r1'); rail('r2'); rail('r3');
+
+/* flicker receipts */
+const vendors = ['晴川商旅', '城際客運', '港都餐飲', '日常文具', '南方旅店', '台灣大車隊', '創研材料', '城際鐵路'];
+let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+let fh = '';
+for (let i = 0; i < 18; i++) {
+  const x = 120 + rnd() * 1560, y = 90 + rnd() * 800, r = (rnd() - .5) * 14, amt = Math.round((300 + rnd() * 4200) / 10) * 10;
+  fh += `<div class="fl" id="f${i}" style="left:${x}px;top:${y}px;rotate:${r}deg"><small>費用憑證 ・ EV-${String(200 + i)}</small><b>${vendors[i % 8]}（模擬）</b><span>NT$${amt.toLocaleString('en-US')}</span></div>`;
+}
+$('s1').innerHTML = fh;
+/* wall */
+const names = ['陳怡安', '林子晴', '王柏翰', '張雅婷', '李承恩', '許家瑜', '周宇辰', '蔡秉修', '黃詩涵', '吳冠廷'];
+const cats = ['住宿費', '交通費', '餐費', '辦公用品', '差旅費', '交通費', '住宿費', '訓練費'];
+let wh = '';
+for (let i = 0; i < 40; i++) {
+  const c = i % 8, r = Math.floor(i / 8), amt = Math.round((300 + rnd() * 4200) / 10) * 10;
+  wh += `<div class="wc" id="w${i}" style="left:${104 + c * 216}px;top:${233 + r * 126}px"><small>EXP-2026-${String(101 + i).padStart(3, '0')}</small><b>${names[i % 10]}</b><span>${cats[(i * 3) % 8]} ・ NT$${amt.toLocaleString('en-US')}</span><div class="wk" id="wk${i}">${svg('check')}</div></div>`;
+}
+$('wall').innerHTML = wh;
+/* fast cards on rail 1 */
+const FAST = [['EXP-2026-102', '台北教育訓練', 'ok', '建議通過'], ['EXP-2026-103', '高雄展會住宿', 'warn', '建議補件'], ['EXP-2026-104', '新竹客戶交通', 'ok', '建議通過'], ['EXP-2026-105', '台南專案餐敘', 'ok', '建議通過'], ['EXP-2026-106', '台中住宿及交通', 'warn', '建議補件'], ['EXP-2026-107', '台北市內交通', 'ok', '建議通過']];
+let ffh = '';
+FAST.forEach(([id, t, tone, b], i) => {
+  ffh += `<div class="mc" id="fc${i}" style="left:-420px;top:344px"><small>${id}</small><b>${t}</b><span class="badge o t-${tone}" style="background:transparent">${b}</span></div>`;
+  ffh += tone === 'ok' ? `<div class="toast t-info" id="ft${i}" style="left:1540px;top:690px"><span data-i="send"></span>已送往下一審核節點</div>` : `<div class="toast t-warn" id="ft${i}" style="left:1560px;top:690px"><span data-i="mail"></span>已通知補件</div>`;
+});
+$('r1fast').outerHTML = ffh;
+/* queue cards */
+const Q = [['EXP-2026-201', '台中客戶拜訪住宿', 'ok', '建議通過', 'pass'], ['EXP-2026-202', '高雄展會支援住宿', 'warn', '建議補件', 'info'], ['EXP-2026-203', '台中設計工作坊交通', 'bad', '建議人工審核', 'human'], ['EXP-2026-204', '台北教育訓練住宿', 'ok', '建議通過', 'pass'], ['EXP-2026-205', '台南客戶餐敘', 'warn', '建議補件', 'info'], ['EXP-2026-206', '新竹供應商會議交通', 'bad', '建議人工審核', 'human'], ['EXP-2026-207', '台北市內客戶交通', 'ok', '建議通過', 'pass']];
+let qh = '';
+Q.forEach(([id, t, tone, b, route], i) => {
+  qh += `<div class="case" id="q${i}" style="left:-520px;top:330px"><small>${id}</small><b>${t}</b><span class="badge o t-${tone}" style="background:transparent">${b}</span></div>`;
+  qh += route === 'pass' ? `<div class="toast t-info" id="qt${i}" style="left:1540px;top:690px"><span data-i="send"></span>已送往下一審核節點</div>`
+    : route === 'info' ? `<div class="toast t-warn" id="qt${i}" style="left:1560px;top:690px"><span data-i="mail"></span>已通知補件</div>`
+    : `<div class="toast t-bad" id="qt${i}" style="left:1560px;top:690px"><span data-i="user"></span>轉人工審核</div>`;
+});
+$('qcards').outerHTML = qh;
+document.querySelectorAll('[data-i]').forEach(el => { el.innerHTML = svg(el.dataset.i) });
+
+/* ---------- engine ---------- */
+const EASE = {
+  out: p => 1 - Math.pow(1 - p, 3), expo: p => p === 1 ? 1 : 1 - Math.pow(2, -10 * p),
+  io: p => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2, lin: p => p,
+  back: p => { const c1 = 1.4, c3 = c1 + 1; return 1 + c3 * Math.pow(p - 1, 3) + c1 * Math.pow(p - 1, 2) },
+  inq: p => p * p * p,
+};
+const TRACKS = new Map();
+function a(sel, t0, d, props, ease = 'expo') {
+  const el = $(sel.replace(/^#/, '')); if (!el) { console.warn('missing', sel); return }
+  if (!TRACKS.has(el)) TRACKS.set(el, {});
+  const m = TRACKS.get(el);
+  for (const [k, [f, to]] of Object.entries(props)) (m[k] ??= []).push({ t0, t1: t0 + d, f, to, e: EASE[ease] });
+}
+function val(list, t) {
+  if (t <= list[0].t0) return list[0].f;
+  let tr = list[0]; for (const x of list) if (x.t0 <= t) tr = x;
+  const p = Math.min(1, Math.max(0, (t - tr.t0) / Math.max(1e-6, tr.t1 - tr.t0)));
+  return tr.f + (tr.to - tr.f) * tr.e(p);
+}
+function render(t) {
+  for (const [el, m] of TRACKS) {
+    const v = {}; for (const k in m) v[k] = val(m[k], t);
+    if ('o' in v) el.style.opacity = v.o;
+    if (el._bl === undefined) { el._bl = parseFloat(el.style.left) || 0; el._bt = parseFloat(el.style.top) || 0 }
+    const dx = 'left' in v ? v.left - el._bl : 0, dy = 'top' in v ? v.top - el._bt : 0;
+    if ('x' in v || 'y' in v || 's' in v || 'sx' in v || 'r' in v || 'left' in v || 'top' in v)
+      el.style.transform = `translate3d(${(v.x ?? 0) + dx}px,${(v.y ?? 0) + dy}px,0) scale(${v.s ?? 1})${v.sx !== undefined ? ` scaleX(${v.sx})` : ''}${v.r !== undefined ? ` rotate(${v.r}deg)` : ''}`;
+    if ('blur' in v) el.style.filter = v.blur > .05 ? `blur(${v.blur}px)` : 'none';
+    if ('num' in v) el.textContent = Math.round(v.num);
+    if ('clip' in v) el.style.clipPath = `inset(0 ${v.clip}% 0 0)`;
+  }
+}
+let SHIFT = 0; const B = n => (n + SHIFT) * 0.5; const D = n => n * 0.5;   // 120 BPM
+const CUES = []; const cue = (beat, type, opt = {}) => CUES.push({ ...opt, t: B(beat), type });
+const set0 = (s, k, v) => a(s, -1, .001, { [k]: [v, v] }, 'lin');
+const hidden = s => set0(s, 'o', 0);
+function tin(s, beat, y = 20, d = .42) { a(s, B(beat), d, { o: [0, 1], y: [y, 0], blur: [8, 0] }) }
+function tout(s, beat, d = .25) { a(s, B(beat), d, { o: [1, 0], y: [0, -10], blur: [0, 6] }, 'io') }
+function scene(id, b0, b1, fin = .12, fout = .12) { a('#' + id, B(b0) - .01, fin, { o: [0, 1] }, 'lin'); a('#' + id, B(b1) - fout, fout, { o: [1, 0] }, 'lin') }
+function pop(s, beat, d = .38) { a(s, B(beat), d, { o: [0, 1], s: [.4, 1] }, 'back') }
+function move(s, beat, dur, from, to, ease = 'io') { a(s, B(beat), D(dur), { left: [from, to] }, ease) }
+function railIn(p, beat, fast = false) {
+  set0(`#${p}l`, 'sx', 0); a(`#${p}l`, B(beat), fast ? .35 : D(4.5), { sx: [0, 1] }, fast ? 'out' : 'io');
+  for (let i = 0; i < 5; i++) {
+    hidden(`#${p}a${i}`); if (i === 3) hidden(`#${p}n3`);
+    pop(`#${p}s${i}`, beat + (fast ? .1 * i : .9 * i + .4));
+    tin(`#${p}t${i}`, beat + (fast ? .1 * i : .9 * i + .6), 12);
+    if (!fast) cue(beat + .9 * i + .4, 'light', { p: i });
+  }
+}
+const on = (p, i, beat, s = true) => { a(`#${p}a${i}`, B(beat), .18, { o: [0, 1] }, 'lin'); if (s) cue(beat, 'click', { p: i }) };
+const off = (p, i, beat) => a(`#${p}a${i}`, B(beat), .2, { o: [1, 0] }, 'lin');
+function toast(s, beat, holdBeats = 3, sound) { hidden(s); a(s, B(beat), .3, { o: [0, 1], y: [10, 0] }); a(s, B(beat + holdBeats), .25, { o: [1, 0] }, 'io'); if (sound) cue(beat, sound.t, sound) }
+
+/* ===== S1 flicker b0–b4 ===== */
+scene('s1', 0, 4, .01, .01);
+for (let i = 0; i < 18; i++) { const bt = i * .21; a('#f' + i, B(bt), .18, { o: [0, 1], s: [1.15, 1] }, 'out'); cue(bt, 'paper', { g: .7 + (i % 3) * .15 }) }
+/* ===== S2 stat b4–b10 ===== */
+scene('s2', 4, 10, .01);
+tin('#s2a', 4.2);
+for (let k = 0; k < 5; k++) { pop('#sc' + k, 4.8 + k * .5); cue(4.8 + k * .5, 'bell', { p: k }) }
+hidden('#sc4r'); a('#sc4r', B(7.4), .25, { o: [0, 1] }, 'lin'); a('#sc4', B(7.4), .3, { s: [1.12, 1] }, 'back'); cue(7.4, 'lowbell');
+tin('#s2b', 7.6); hidden('#s2src'); a('#s2src', B(7.8), .4, { o: [0, 1] }, 'lin');
+/* ===== S3 wall + Hero1 b10–b23 ===== */
+scene('s3', 10, 23, .01);
+for (let i = 0; i < 40; i++) {
+  const c = i % 8, r = Math.floor(i / 8), bt = 10 + ((c * 5 + r * 3) % 17) / 17 * 1.6;
+  a('#w' + i, B(bt), .35, { o: [0, 1], s: [.6, 1] });
+  hidden('#wk' + i);
+}
+for (let k = 0; k < 10; k++) cue(10 + k * .16, 'paper', { g: .5 });
+a('#wall', B(10), D(6), { s: [1.08, 1] }, 'out');
+for (let i = 0; i < 40; i++) a('#w' + i, B(11.6), .3, { o: [1, .22] }, 'io');
+tin('#s3a', 11.8); tout('#s3a', 15.5);
+// check wave
+for (let i = 0; i < 40; i++) {
+  const c = i % 8, r = Math.floor(i / 8), bt = 16 + (c + r) * .14;
+  a('#w' + i, B(bt), .2, { o: [.22, 1] }, 'lin'); pop('#wk' + i, bt, .28);
+}
+for (let k = 0; k < 12; k++) cue(16 + k * .14, 'tick', { p: k });
+// converge into mark
+const MX = 665, MY = 462;
+for (let i = 0; i < 40; i++) {
+  const c = i % 8, r = Math.floor(i / 8), cx = 104 + c * 216 + 100, cy = 233 + r * 126 + 55;
+  const bt = 18 + ((c * 3 + r * 5) % 11) * .03;
+  a('#w' + i, B(bt), .5, { x: [0, MX - cx], y: [0, MY - cy], s: [1, .15] }, 'inq');
+  a('#w' + i, B(bt) + .38, .12, { o: [1, 0] }, 'lin');
+}
+cue(17.4, 'suck');
+hidden('#mark4'); a('#mark4', B(19), .5, { o: [0, 1], s: [.3, 1] }, 'back'); cue(19, 'impact', { g: .6, chord: true });
+hidden('#word4'); a('#word4', B(19.4), .5, { o: [0, 1], x: [-30, 0], blur: [10, 0] });
+tin('#sub4', 20, 10);
+a('#logo4', B(22.4), .25, { o: [1, 0], blur: [0, 8] }, 'io'); tout('#sub4', 22.4);
+/* ===== Rail 1 + product UI b23–b74 ===== */
+function recIn(s, beat, tone) { a(s, B(beat), .45, { o: [0, 1], y: [16, 0], s: [.98, 1] }); cue(beat, 'rec', { tone }) }
+function click(beat, p) { a('#cur', B(beat), .08, { s: [1, .85] }, 'lin'); a('#cur', B(beat) + .08, .12, { s: [.85, 1] }, 'lin'); cue(beat, 'click', { p }) }
+set0('#r1', 'o', 0); a('#r1', B(23), .15, { o: [0, 1] }, 'lin');
+tin('#r1k', 23.2, 8); railIn('r1', 23);
+tin('#r1c', 28); hidden('#r1d');
+hidden('#cpop');
+hidden('#ca'); a('#ca', B(29), .3, { o: [0, 1] }, 'lin'); move('#ca', 29, 1, -420, SX[0] - 150, 'out'); cue(29, 'whoosh', { g: .5 });
+on('r1', 0, 29.8);
+move('#ca', 31, 1, SX[0] - 150, SX[1] - 150); on('r1', 1, 32);
+// dive into 審查 station
+a('#r1', B(33.2), D(1.8), { s: [1, 4], x: [0, 1400], y: [0, 80] }, 'io');
+a('#r1', B(34.3), .35, { o: [1, 0] }, 'lin'); cue(33.4, 'zoom');
+scene('ui', 34.6, 57.2, .3, .01);
+a('#win', B(34.6), .8, { s: [.55, 1], blur: [10, 0] }, 'expo');
+hidden('#uic'); tin('#uic', 35.8, 12); tout('#uic', 41.3); hidden('#uic2'); tin('#uic2', 41.6, 12); tout('#uic2', 50.1); hidden('#uic3'); tin('#uic3', 50.4, 12);
+for (let i = 0; i < 7; i++) { hidden('#tr' + i); a('#tr' + i, B(36 + i * .3), .3, { o: [0, 1], x: [-12, 0] }); cue(36 + i * .3, 'type') }
+hidden('#cur'); a('#cur', B(38.5), .2, { o: [0, 1] }, 'lin');
+a('#cur', B(38.5), D(1.3), { left: [1300, 470], top: [860, 566] }, 'io');
+hidden('#trh'); a('#trh', B(39.6), .15, { o: [0, 1] }, 'lin');
+click(40, 3);
+hidden('#det'); a('#det', B(40.2), .45, { o: [0, 1], x: [140, 0] }); cue(40.2, 'whoosh', { g: .35 });
+hidden('#uinfo'); a('#uinfo', B(41), .4, { o: [0, 1], y: [8, 0] });
+for (let k = 0; k < 6; k++) { const bt = 41.8 + k * .7; hidden('#ur' + k); hidden('#uri' + k); a('#ur' + k, B(bt), .35, { o: [0, 1], y: [10, 0] }); pop('#uri' + k, bt); cue(bt, k === 1 ? 'find' : 'tick', { p: k }) }
+hidden('#udisc'); a('#udisc', B(46), .3, { o: [0, 1] }, 'lin');
+a('#cur', B(46.1), D(.9), { left: [470, 1080], top: [566, 728] }, 'io');
+click(47.1, 4);
+hidden('#upv'); a('#upv', B(47.3), .45, { o: [0, 1], y: [20, 0], s: [.94, 1] }); cue(47.3, 'soft', { p: 2 });
+hidden('#abox'); a('#abox', B(48.3), .3, { o: [0, 1], s: [1.08, 1] }); cue(48.3, 'light', { p: 3 });
+hidden('#uchip'); tin('#uchip', 48.6, 8);
+a('#upv', B(50.1), .3, { o: [1, 0], y: [0, 10] }, 'io'); tout('#uchip', 50.1);
+hidden('#urec'); recIn('#urec', 50.6, 'bad');
+hidden('#co1'); tin('#co1', 51.6, 8); cue(51.6, 'light', { p: 2 });
+hidden('#co2'); tin('#co2', 52.6, 8); cue(52.6, 'light', { p: 4 });
+a('#cur', B(52.8), .3, { o: [1, 0] }, 'lin');
+tout('#uic3', 55.6); tout('#co1', 55.6); tout('#co2', 55.6);
+// shrink UI back into the case card on the rail
+a('#win', B(56), D(1.2), { s: [1, .19], y: [0, -167] }, 'io'); a('#win', B(56.8), .3, { o: [1, 0] }, 'lin'); cue(56, 'suck');
+set0('#ca', 'left', SX[0] - 150);
+a('#r1', B(56.2), .01, { s: [1, 1], x: [0, 0], y: [0, 0] }, 'lin');
+a('#r1', B(56.4), .35, { o: [0, 1] }, 'lin');
+a('#ca', B(56.4), .01, { left: [SX[2] - 150, SX[2] - 150] }, 'lin');
+on('r1', 2, 56.6, false);
+hidden('#caB'); pop('#caB', 57.4); cue(57.4, 'rec', { tone: 'bad' });
+move('#ca', 58.6, 1, SX[2] - 150, SX[3] - 150); on('r1', 3, 59.6, false);
+toast('#caCtl', 59.8, 4, { t: 'light', p: 3 });
+move('#ca', 61.4, 1, SX[3] - 150, SX[4] - 150); on('r1', 4, 62.4, false);
+toast('#caAct', 62.6, 3.4, { t: 'rec', tone: 'bad' });
+a('#ca', B(64.4), D(.8), { y: [0, 200] }, 'io'); a('#ca', B(64.8), .25, { o: [1, 0] }, 'lin');
+a('#r1', B(66.2) - .15, .15, { o: [1, 0] }, 'lin');
+/* ===== UI montage b66–b93 ===== */
+function clickAt(sel, beat, p) { a(sel, B(beat), .08, { s: [1, .85] }, 'lin'); a(sel, B(beat) + .08, .12, { s: [.85, 1] }, 'lin'); cue(beat, 'click', { p }) }
+scene('um', 66, 96, .2, .15);
+a('#win2', B(66), .6, { o: [0, 1], s: [.94, 1], blur: [10, 0] }); cue(66, 'whoosh', { g: .45 });
+hidden('#umc1'); tin('#umc1', 66.4, 12); hidden('#umc2');
+set0('#umN', 'num', 6);
+const PRESS = [[1, 1679], [0, 1527], [0, 1527], [0, 1527], [1, 1662], [1, 1654]];
+const NOTE_SND = ['act', 'info', 'info', 'info', 'act', 'rec'];
+const TONES = ['ok', 'warn', 'bad', 'bad', 'bad', 'bad'];
+hidden('#umh'); set0('#umh', 'top', 44);
+set0('#cur2', 'left', 1300); set0('#cur2', 'top', 900); hidden('#cur2'); a('#cur2', B(67), .2, { o: [0, 1] }, 'lin');
+let px = 1300, py = 900;
+for (let i = 0; i < 6; i++) {
+  const t0 = 67.2 + i * 4.1 + (i >= 2 ? 3 : 0), ry = 392 + 58 * i, [pb, bx] = PRESS[i], dT = i === 1 ? 3 : 0;
+  a('#cur2', B(t0), D(.7), { left: [px, 470], top: [py, ry] }, 'io');
+  clickAt('#cur2', t0 + .8, i);
+  if (i === 0) a('#umh', B(t0 + .8), .15, { o: [0, 1] }, 'lin');
+  else a('#umh', B(t0 + .8), .2, { top: [44 + 58 * (i - 1), 44 + 58 * i] }, 'io');
+  hidden('#md' + i); a('#md' + i, B(t0 + .9), .35, { o: [0, 1], x: [80, 0] });
+  if (i > 0) a('#md' + (i - 1), B(t0 + .9), .2, { o: [1, 0] }, 'lin');
+  if ($('mf' + i)) { a('#mf' + i, B(t0 + 1.5), .35, { s: [1.03, 1] }, 'back'); cue(t0 + 1.5, 'find') } else cue(t0 + 1.5, 'tick', { p: 2 });
+  hidden('#mc' + i); a('#mc' + i, B(t0 + 1.8), .35, { o: [0, 1], y: [10, 0] }); cue(t0 + 1.8, 'rec', { tone: TONES[i] });
+  a('#cur2', B(t0 + 2.4), D(.6), { left: [470, bx], top: [ry, 958] }, 'io');
+  clickAt('#cur2', t0 + 3.1, i + 2);
+  hidden('#mg' + i); a('#mg' + i, B(t0 + 3.1), .12, { o: [0, 1] }, 'lin'); a('#mb' + i + pb, B(t0 + 3.1), .14, { s: [.94, 1] }, 'back');
+  hidden('#mn' + i); a('#mn' + i, B(t0 + 3.2 + dT), .3, { o: [0, 1], x: [-10, 0] }); cue(t0 + 3.2 + dT, NOTE_SND[i], { tone: 'bad' });
+  hidden('#ms' + i); a('#ms' + i, B(t0 + 3.3 + dT), .25, { o: [0, 1] }, 'lin'); a('#mz' + i, B(t0 + 3.3 + dT), .2, { o: [1, 0] }, 'lin');
+  a('#umN', B(t0 + 3.3 + dT), .01, { num: [6 - i, 5 - i] }, 'lin');
+  px = bx; py = 958;
+  if (i === 1) {
+    hidden('#dft'); a('#dft', B(t0 + 3.3), .4, { o: [0, 1], y: [16, 0], s: [.97, 1] }); cue(t0 + 3.3, 'whoosh', { g: .3 });
+    set0('#dftx', 'clip', 100); a('#dftx', B(t0 + 3.7), D(1.3), { clip: [100, 0] }, 'lin');
+    for (let k = 0; k < 9; k++) cue(t0 + 3.7 + k * .14, 'type');
+    a('#cur2', B(t0 + 5.1), D(.5), { left: [bx, 1440], top: [958, 717] }, 'io');
+    clickAt('#cur2', t0 + 5.7, 3); a('#dfs', B(t0 + 5.7), .14, { s: [.94, 1] }, 'back');
+    a('#dft', B(t0 + 5.9), .3, { o: [1, 0], y: [0, 10] }, 'io');
+    px = 1440; py = 717;
+  }
+}
+tout('#umc1', 86.4); tin('#umc2', 86.8, 12);
+a('#cur2', B(95), .3, { o: [1, 0] }, 'lin');
+SHIFT = 19;
+/* ===== Control b77–b95 ===== */
+scene('ctl', 77, 95, .1);
+railIn('r2', 77, true); for (let i = 0; i < 3; i++) set0('#r2a' + i, 'o', 0);
+tin('#ctlc1', 77.5);
+hidden('#cb'); a('#cb', B(79), .3, { o: [0, 1] }, 'lin'); move('#cb', 79, .7, -420, SX[0] - 150, 'out'); cue(79, 'whoosh', { g: .5 });
+on('r2', 0, 79.5);
+move('#cb', 80, .6, SX[0] - 150, SX[1] - 150); on('r2', 1, 80.5); for (let k = 0; k < 4; k++) cue(80.6 + k * .2, 'tick', { p: k });
+move('#cb', 81.4, .6, SX[1] - 150, SX[2] - 150); on('r2', 2, 81.9, false);
+hidden('#cbB'); pop('#cbB', 82); cue(82, 'rec', { tone: 'ok' });
+move('#cb', 83, .7, SX[2] - 150, SX[3] - 150); on('r2', 3, 83.5, false);
+hidden('#gate'); a('#gate', B(83.9), .22, { o: [0, 1], y: [-260, 0] }, 'back'); cue(83.9, 'shutter');
+a('#cb', B(84), .12, { x: [0, 26] }, 'out'); a('#cb', B(84.25), .25, { x: [26, 0] }, 'out');
+a('#r2n3', B(84), .15, { o: [0, 1] }, 'lin');
+hidden('#why'); tin('#why', 84.4, 8);
+tout('#ctlc1', 85.6);
+a('#cb', B(86), D(2), { top: [330, 760] }, 'io'); a('#cb', B(86), D(2), { left: [SX[3] - 150, 1140] }, 'out'); cue(86, 'drop');
+toast('#cbAct', 87.6, 7, { t: 'rec', tone: 'bad' });
+[0, 1, 2].forEach(k => { hidden('#lg' + k); a('#lg' + k, B(88 + k * .5), .3, { o: [0, 1], x: [-12, 0] }); cue(88 + k * .5, 'type') });
+hidden('#ctlc2'); tin('#ctlc2', 89.4);
+/* ===== Misjudgment (six controls) b95–b113 ===== */
+scene('mj', 95, 113, .15, .2);
+hidden('#mjk'); tin('#mjk', 95.2, 8); hidden('#mjt'); tin('#mjt', 95.5);
+for (let k = 0; k < 6; k++) { hidden('#mj' + k); a('#mj' + k, B(97 + k * .9), .45, { o: [0, 1], y: [24, 0] }); cue(97 + k * .9, 'light', { p: k }) }
+SHIFT = 37;
+/* ===== Queue → human b95–b111 ===== */
+scene('qs', 95, 111, .12);
+railIn('r3', 95, true);
+for (let i = 0; i < 5; i++) a('#r3a' + i, B(95.6), .3, { o: [0, 1] }, 'lin');
+Q.forEach(([, , , , route], i) => {
+  const b0 = 96 + i * .85, arr = b0 + 2.4;
+  a('#q' + i, B(b0), D(2.4), { left: [-520, 1510] }, 'lin');
+  toast('#qt' + i, arr - .1, route === 'human' ? 3 : 1, { t: route === 'pass' ? 'act' : route === 'info' ? 'info' : 'rec', tone: 'bad' });
+  cue(b0, 'click', { p: i });
+  if (route === 'pass') a('#q' + i, B(arr), D(.5), { left: [1510, 2250] }, 'io');
+  else if (route === 'info') { a('#q' + i, B(arr), D(.6), { y: [0, 200] }, 'io'); a('#q' + i, B(arr + .3), .25, { o: [1, 0] }, 'lin') }
+  else { const hx = i === 2 ? 1160 : 1510; a('#q' + i, B(arr + .2), D(.8), { top: [330, 150], left: [1510, hx] }, 'io') }
+});
+// clear everything but the two human cases
+const railEls = ['r3l', ...[0, 1, 2, 3, 4].flatMap(i => [`r3s${i}`, `r3t${i}`])];
+railEls.forEach(id => a('#' + id, B(104.8), .5, { o: [1, 0] }, 'io'));
+a('#q2', B(105.4), D(1.4), { left: [1160, 520], top: [150, 470], s: [1, 1.18] }, 'io');
+a('#q5', B(105.4), D(1.4), { left: [1510, 1100], top: [150, 470], s: [1, 1.18] }, 'io');
+cue(105.4, 'whoosh', { g: .4 });
+hidden('#qk'); tin('#qk', 106.8, 8);
+/* ===== Payoff b111–b123 ===== */
+scene('pay', 111, 123, .2, .3);
+tin('#payT', 111.3, 16, .7);
+/* ===== End b123–b140 ===== */
+scene('end', 123, 140, .15, .9);
+a('#logo9', B(123), .7, { o: [0, 1], s: [.95, 1], blur: [14, 0] }); cue(123, 'impact', { g: .7, chord: true, final: true });
+tin('#slo9', 125, 10); hidden('#foot9'); a('#foot9', B(127), .6, { o: [0, 1] }, 'lin');
+
+const DURATION = B(140);
+for (const m of TRACKS.values()) for (const k in m) m[k].sort((p, q) => p.t0 - q.t0);
+window.__seek = t => render(t); window.__duration = DURATION; window.__cues = CUES; window.__vo = [];
+
+function fit() { const s = Math.min(innerWidth / 1920, innerHeight / 1080); const st = $('stage'); st.style.transform = `scale(${s})`; st.style.left = (innerWidth - 1920 * s) / 2 + 'px'; st.style.top = (innerHeight - 1080 * s) / 2 + 'px' }
+addEventListener('resize', fit); fit();
+if (new URLSearchParams(location.search).has('render')) { $('hud').remove(); render(0) }
+else {
+  const audio = new Audio('mix.m4a'); let t = 0, playing = false, started = false, last = performance.now();
+  const toggle = () => { playing = !playing; started = true; if (playing) { audio.currentTime = t; audio.play().catch(() => {}) } else audio.pause() };
+  const tick = now => { if (playing) { t = !audio.paused && audio.readyState > 2 ? audio.currentTime : t + (now - last) / 1000; if (t > DURATION) { t = 0; audio.currentTime = 0 } } last = now; render(t); $('hud').textContent = `${t.toFixed(1)}s / ${DURATION.toFixed(1)}s ・ ${started ? '空白鍵 播放/暫停 ・ ←→ 跳 2 秒' : '按空白鍵開始播放（含聲音）'}`; requestAnimationFrame(tick) };
+  addEventListener('keydown', e => { if (e.code === 'Space') { toggle(); e.preventDefault() } if (e.code === 'ArrowRight' || e.code === 'ArrowLeft') { t = Math.max(0, Math.min(DURATION, t + (e.code === 'ArrowRight' ? 2 : -2))); audio.currentTime = t } });
+  addEventListener('click', toggle); requestAnimationFrame(tick);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "name": "checkmate-video-tools",
+  "private": true,
+  "type": "module",
+  "description": "Render pipeline for the CheckMate launch film (HTML timeline -> frames -> mp4)",
+  "dependencies": {
+    "playwright-core": "^1.63.0"
+  }
+}
