@@ -16,7 +16,7 @@ CheckMate 是企業費用審查中的代理式（Agentic）服務，協助完成
 | [`app/`](app/) | **主原型**：案件初審工作台（React + Vite，8 筆模擬案件） | [checkmate-demo-mauve.vercel.app](https://checkmate-demo-mauve.vercel.app) |
 | [`booth/`](booth/) | **展場互動版**：現場送件、調整企業規範、查看稽核紀錄 | [checkmate-booth.vercel.app](https://checkmate-booth.vercel.app) |
 | [`pitch/`](pitch/) | **Pitch 簡報**（18 頁，含發布影片） | [checkmate-pitch-mu.vercel.app](https://checkmate-pitch-mu.vercel.app/s/checkmate-pitch) |
-| [`video/`](video/) | **發布影片**（88.5 秒）的原始檔與渲染工具 | 見簡報第 5 頁 |
+| [`video/`](video/) | **發布影片**（88.5 秒）的原始檔與渲染工具 | 見簡報第 5 頁；v1–v6 見 [Release](https://github.com/nancy-0529/CheckMate/releases/tag/archive-videos) |
 | [`print/`](print/) | 展場立牌（90×180 cm）向量印刷檔 | — |
 
 想快速理解專題，建議的閱讀順序：[專案脈絡](docs/PROJECT.md) → 本頁下方的產品說明 → 線上原型與簡報。
@@ -165,6 +165,36 @@ npm test         # 單元測試
 npm run build    # production build
 npm run lint     # 程式碼風格檢查
 ```
+
+---
+
+## 部署與線上連結
+
+三個線上版本都部署在 Vercel（team `nancy-0529s-projects`），各自對應一個資料夾：
+
+| 資料夾 | Vercel 專案 | 網址 |
+|---|---|---|
+| `app/` | `checkmate-demo` | https://checkmate-demo-mauve.vercel.app |
+| `booth/` | `checkmate-booth` | https://checkmate-booth.vercel.app |
+| `pitch/` | `checkmate-pitch` | https://checkmate-pitch-mu.vercel.app/s/checkmate-pitch |
+
+其他連結：
+
+- **GitHub repo**：https://github.com/nancy-0529/CheckMate
+- **舊版影片 v1–v6 與原始檔**：[Release `archive-videos`](https://github.com/nancy-0529/CheckMate/releases/tag/archive-videos)（mp4、`v2`–`v6-source.zip`、`checkmate-launch.html`）
+- **最終版影片 v7**：[`pitch/slides/checkmate-pitch/assets/checkmate-film-v7.mp4`](pitch/slides/checkmate-pitch/assets/checkmate-film-v7.mp4)
+
+### 重新部署
+
+資料夾內沒有 `.vercel/` 設定（不進版控），在新環境第一次部署前要先連結專案：
+
+```bash
+cd app            # 或 booth、pitch
+vercel link       # 選 team nancy-0529s-projects，並選對應的既有專案（見上表）
+vercel --prod
+```
+
+線上網址綁在 Vercel 專案上，與本機資料夾無關。
 
 ---
 
